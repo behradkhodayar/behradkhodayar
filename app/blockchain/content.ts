@@ -8,6 +8,14 @@ import { type Post, byDateDesc } from "../lib/content";
 
 export const posts: Post[] = [
   {
+    slug: "were-not-as-rich-as-you-think",
+    title: "We're Not as Rich as You Think!",
+    date: "2018-10-28",
+    excerpt:
+      "Why Bitcoin early birds mostly aren't the millionaires people imagine — my Farsi translation of Gavin Andresen's piece, rendered back into English.",
+    tags: ["Bitcoin", "Translation", "BlockFarsi"],
+  },
+  {
     slug: "ibm-omfif-cbdc-study",
     title: "IBM Study: Central Banks Should Issue Digital Currencies",
     date: "2018-10-28",
