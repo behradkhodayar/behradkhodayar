@@ -8,6 +8,14 @@ import { type Post, byDateDesc } from "../lib/content";
 
 export const posts: Post[] = [
   {
+    slug: "ibm-omfif-cbdc-study",
+    title: "IBM Study: Central Banks Should Issue Digital Currencies",
+    date: "2018-10-28",
+    excerpt:
+      "The IBM/OMFIF study: most surveyed financial institutions think central banks should develop CBDCs — plus the skeptics at HSBC & the BOJ. Translated from BlockFarsi.",
+    tags: ["CBDC", "News", "BlockFarsi"],
+  },
+  {
     slug: "oracle-blockchain-cloud-service",
     title: "Oracle Releases Its Blockchain SaaS Suite",
     date: "2018-10-27",
