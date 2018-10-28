@@ -1,0 +1,50 @@
+import PostLayout from "../../ai/components/PostLayout";
+
+export const meta = {
+  title: "We're Not as Rich as You Think!",
+  date: "2018-10-28",
+  tags: ["Bitcoin", "Translation", "BlockFarsi"],
+};
+
+export const metadata = {
+  title: meta.title,
+  description:
+    "Why Bitcoin early birds mostly aren't the millionaires people imagine — my Farsi translation of Gavin Andresen's piece, from the BlockFarsi archive, rendered back into English.",
+  alternates: {
+    canonical: "https://behrad.khodayar.me/blockchain/were-not-as-rich-as-you-think/",
+  },
+};
+
+export default function Layout({ children }) {
+  return (
+    <PostLayout meta={meta} backHref="/blockchain" backLabel="Blockchain">
+      {children}
+    </PostLayout>
+  );
+}
+
+*Originally published in Farsi as «آنطور هم که فکر می کنید، ثروتمند نیستیم!» on **بلاک فارسی (BlockFarsi)** — the blockchain news & education outlet I ran — on October 28, 2018. It was my Farsi translation of Gavin Andresen's post on early-Bitcoiner wealth; what follows is an English rendering of what I published. Original text recovered via the [Wayback Machine](https://web.archive.org/web/20190114213718/http://blockfarsi.com/articles/%d8%a2%d9%86%d8%b7%d9%88%d8%b1-%d9%87%d9%85-%da%a9%d9%87-%d9%81%da%a9%d8%b1-%d9%85%db%8c-%da%a9%d9%86%db%8c%d8%af%d8%8c-%d8%ab%d8%b1%d9%88%d8%aa%d9%85%d9%86%d8%af-%d9%86%db%8c%d8%b3%d8%aa%db%8c%d9%85/).*
+
+As reported by BlockFarsi: Gavin Andresen, one of the most influential figures in the Bitcoin world, published an interesting article on his personal website about the assumptions the public makes regarding the wealth of Bitcoin veterans. Since that mindset is hardly foreign in our country, Iran, we decided to translate his article for the dear readers of BlockFarsi.
+
+People assume that those who were involved with Bitcoin from its earliest years are spectacularly wealthy.
+
+That assumption is wrong, for several reasons:
+
+In the early days, losing bitcoins was extremely common. Since they weren't worth much, people generally didn't bother taking care of them.
+
+Many early developers had no spare money to buy bitcoin — they were students, or had all their money tied up in startups. Investors weren't throwing money at Bitcoin in the first years either!
+
+Holding bitcoin as a long-term investment was not remotely the norm. Back then, the custom was to encourage adoption: holders would symbolically price & pay for some of their daily needs in bitcoin.
+
+Even if someone had spare capital plus a correct prediction of Bitcoin's price growth and bought a large amount, they most likely followed sound investment advice and by now:
+
+1. Either they have a long-term holding plan and their capital is still in bitcoin, or
+
+2. They've put their eggs in several baskets — diversifying their portfolio across multiple investments to avoid the risk of sudden loss from concentrating purely on Bitcoin.
+
+Consider a rational, disciplined person who had one hundred thousand dollars before investing. At the start of 2011 they accepted the risk of investing in Bitcoin and bought five thousand dollars' worth. Their long-term plan: review annually, and rebalance whenever bitcoin exceeds ten percent of the portfolio.
+
+I made a spreadsheet to explain what happens. If they follow the best financial practice, with Bitcoin's thousand-fold growth over their initial investment they'd have a thousand-fold return — five million dollars. But in reality, to manage risk, they would have sold most of their bitcoin over the intervening years and would now hold about 40 BTC.
+
+40 BTC has at best been worth a few hundred thousand dollars (about $800K in late 2017) — and five million dollars is what an ordinary person receives for their retirement and the rest of their life!
