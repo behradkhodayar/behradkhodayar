@@ -8,6 +8,14 @@ import { type Post, byDateDesc } from "../lib/content";
 
 export const posts: Post[] = [
   {
+    slug: "bitcoin-global-warming",
+    title: "Bitcoin Adoption Could Push Global Warming Past the 2°C Threshold",
+    date: "2018-10-31",
+    excerpt:
+      "Covering the Nature Climate Change study on Bitcoin's carbon footprint — projections, mining economics, and proposed fixes. Translated from BlockFarsi.",
+    tags: ["Bitcoin", "Energy", "BlockFarsi"],
+  },
+  {
     slug: "were-not-as-rich-as-you-think",
     title: "We're Not as Rich as You Think!",
     date: "2018-10-28",

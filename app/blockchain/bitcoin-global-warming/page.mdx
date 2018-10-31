@@ -1,0 +1,52 @@
+import PostLayout from "../../ai/components/PostLayout";
+
+export const meta = {
+  title: "Bitcoin Adoption Could Push Global Warming Past the 2°C Threshold",
+  date: "2018-10-31",
+  tags: ["Bitcoin", "Energy", "BlockFarsi"],
+};
+
+export const metadata = {
+  title: meta.title,
+  description:
+    "Covering the Nature Climate Change study on Bitcoin's carbon footprint — projections, the economics of mining, and proposed fixes. Translated from the BlockFarsi archive.",
+  alternates: {
+    canonical: "https://behrad.khodayar.me/blockchain/bitcoin-global-warming/",
+  },
+};
+
+export default function Layout({ children }) {
+  return (
+    <PostLayout meta={meta} backHref="/blockchain" backLabel="Blockchain">
+      {children}
+    </PostLayout>
+  );
+}
+
+*Originally published in Farsi as «مقبولیت و بکارگیری گسترده بیت کوین می تواند گرم شدن جهانی را به بیش از آستانه ۲ درجه سانتیگراد بکشاند!» on **بلاک فارسی (BlockFarsi)** — the blockchain news & education outlet I ran — on October 31, 2018; translated to English for this site. Original text recovered via the [Wayback Machine](https://web.archive.org/web/2019/http://blockfarsi.com/articles/%d8%a7%d8%b3%d8%aa%d8%ae%d8%b1%d8%a7%d8%ac-%d8%a8%db%8c%d8%aa-%da%a9%d9%88%db%8c%d9%86-%d9%88-%da%af%d8%b1%d9%85%d8%a7%db%8c%d8%b4-%d8%b2%d9%85%db%8c%d9%86/).*
+
+As reported by BlockFarsi: a new report from climate-change scientists — sounding the alarm on Bitcoin's (BTC) carbon footprint and its potentially severe future effect on global warming — was published October 29 on the well-known Nature.com.
+
+## The projections
+
+The report extrapolates the available data on Bitcoin's electricity consumption, plus multiple projections for crypto adoption in the coming years.
+
+Per a 2017 report, out of a total of 314.2 billion cashless transactions, Bitcoin's share was estimated at roughly 0.033 percent. While acknowledging that rapid growth is typical in the early phase of new technologies, the report says that even if Bitcoin follows a "median growth trend" at the lower end, it could match the global total of cashless transactions in under 100 years.
+
+If that materializes, Bitcoin's cumulative emissions would cross the 2°C threshold within 22 years if its adoption pace resembles some of the "slowest-adopted technologies" — or within 11 years at the fastest adoption pace. (Current average global warming stands at 1.5°C.)
+
+The carbon-footprint projection assumes the fuel mix used to generate electricity today stays relatively constant over the coming years.
+
+For Bitcoin's current carbon footprint, the report cites Digiconomist, whose estimate rests on these assumptions:
+
+60 percent of the economic output of Bitcoin's transaction-verification process goes to electricity, at $0.05 per kWh, emitting the equivalent of 0.7 kg of carbon dioxide (CO2e) per kWh. As of May 2018, Bitcoin's consumption was estimated to emit 33.5 metric tons of CO2e annually.
+
+## Mining economics, carbon intensity & proposed fixes
+
+While declining to predict "Bitcoin's fate," the scientists note that economic logic pushes miners to migrate to regions with cheap energy sources, and accordingly suggest that decarbonizing electricity could help reduce Bitcoin's carbon impact — but only where power from renewables is cheaper than fossil fuels.
+
+Where energy costs remain high, more efficient hardware could help shrink the footprint; still, rather than relying on "hardware currently in development," the report recommends "simple modifications to the overall system — such as adding more transactions per block, or reducing the difficulty or time required to resolve the proof-of-work" — so that Bitcoin's electricity consumption drops.
+
+Not all energy experts share the view that high energy consumption is Bitcoin's "Achilles' heel."
+
+A report published in August criticized the exclusive focus on mining's energy intensity, stressed the importance of where energy is produced and how it is generated, and argued that "electricity production can increase so long as it inflicts minimal impact on the environment."
