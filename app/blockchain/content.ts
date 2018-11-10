@@ -8,6 +8,14 @@ import { type Post, byDateDesc } from "../lib/content";
 
 export const posts: Post[] = [
   {
+    slug: "did-bitcoin-sanction-iran",
+    title: "Did Bitcoin Sanction Iran?!",
+    date: "2018-11-10",
+    excerpt:
+      "Separating fact from headline around US sanctions, seized bitcoins and exchange geo-blocks — why 'Bitcoin sanctioned Iran' is a category error. Translated from BlockFarsi.",
+    tags: ["Bitcoin", "Regulation", "BlockFarsi"],
+  },
+  {
     slug: "bitcoin-global-warming",
     title: "Bitcoin Adoption Could Push Global Warming Past the 2°C Threshold",
     date: "2018-10-31",
