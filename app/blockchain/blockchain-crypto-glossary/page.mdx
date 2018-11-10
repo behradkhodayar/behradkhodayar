@@ -1,0 +1,34 @@
+import PostLayout from "../../ai/components/PostLayout";
+
+export const meta = {
+  title: "Blockchain & Cryptocurrency Glossary",
+  date: "2018-11-10",
+  tags: ["Glossary", "BlockFarsi"],
+};
+
+export const metadata = {
+  title: meta.title,
+  description:
+    "A Farsi glossary of blockchain & cryptocurrency terminology I maintained on BlockFarsi — the surviving entries, translated to English.",
+  alternates: {
+    canonical: "https://behrad.khodayar.me/blockchain/blockchain-crypto-glossary/",
+  },
+};
+
+export default function Layout({ children }) {
+  return (
+    <PostLayout meta={meta} backHref="/blockchain" backLabel="Blockchain">
+      {children}
+    </PostLayout>
+  );
+}
+
+*Originally published in Farsi as «واژه نامه بلاکچین ( زنجیره بلوکی ) و ارز دیجیتال ( رمز ارز )» on **بلاک فارسی (BlockFarsi)** — the blockchain news & education outlet I ran — on November 10, 2018; translated to English for this site. It was a living glossary; only the early entries survived in the [Wayback Machine](https://web.archive.org/web/2019/http://blockfarsi.com/tutorial/persian-blockchain-cryptocurrency-glossary/) snapshot.*
+
+In this long & rich article we introduce, translate and briefly explain the vast majority of the specialized vocabulary & common idioms of blockchain and cryptocurrency:
+
+**51% Attack (majority attack):** if hashing power equal to or greater than half the network's hash rate is produced by one person or group, a 51% attack becomes operational. By the network's very definition & structure, that person or group takes control of the network and gains the ability to interfere destructively — halting or altering transactions, or double-spending cryptocurrency.
+
+**Address:** a string of letters & numbers that cryptocurrencies can be sent to or from. A cryptocurrency address can be shared publicly — as a plain string or as a QR code — with whoever we want to receive crypto from.
+
+**Blockchain:** a shared digital ledger that cannot be altered once a transaction has been recorded and validated. All parties to a transaction — plus a substantial number of people uninvolved in it — keep a copy of the ledger (i.e., the blockchain), which means forging a transaction by altering every copy of the record across the whole world is impossible. Bitcoin's success spawned nearly 1,000 new cryptocurrencies, which mistakenly created the impression that the only use of blockchain technology is creating digital currency. Blockchain's capability, however, goes far beyond cryptocurrency: it can be used wherever transactions need personal identification, polling, elections and other kinds of democratic decision-making, audit trails & more.

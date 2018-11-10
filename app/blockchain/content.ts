@@ -16,6 +16,14 @@ export const posts: Post[] = [
     tags: ["Bitcoin", "Regulation", "BlockFarsi"],
   },
   {
+    slug: "blockchain-crypto-glossary",
+    title: "Blockchain & Cryptocurrency Glossary",
+    date: "2018-11-10",
+    excerpt:
+      "The blockchain & crypto glossary I maintained on BlockFarsi — the entries that survived in the Wayback Machine, translated to English.",
+    tags: ["Glossary", "BlockFarsi"],
+  },
+  {
     slug: "bitcoin-global-warming",
     title: "Bitcoin Adoption Could Push Global Warming Past the 2°C Threshold",
     date: "2018-10-31",
