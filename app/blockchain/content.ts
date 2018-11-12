@@ -8,6 +8,14 @@ import { type Post, byDateDesc } from "../lib/content";
 
 export const posts: Post[] = [
   {
+    slug: "what-is-web3",
+    title: "What is Web3?",
+    date: "2018-11-12",
+    excerpt:
+      "The decentralized web as the next generation of the internet — killing the server, data democracy, and the Web3 stack. Translated from my Farsi outlet, بلاک فارسی (BlockFarsi).",
+    tags: ["Web3", "Tutorial", "BlockFarsi"],
+  },
+  {
     slug: "did-bitcoin-sanction-iran",
     title: "Did Bitcoin Sanction Iran?!",
     date: "2018-11-10",

@@ -1,0 +1,81 @@
+import PostLayout from "../../ai/components/PostLayout";
+
+export const meta = {
+  title: "What is Web3?",
+  date: "2018-11-12",
+  tags: ["Web3", "Tutorial", "BlockFarsi"],
+};
+
+export const metadata = {
+  title: meta.title,
+  description:
+    "The decentralized web as the next generation of the internet — killing the server, data democracy, the Web3 stack and its future. Translated from the BlockFarsi archive.",
+  alternates: {
+    canonical: "https://behrad.khodayar.me/blockchain/what-is-web3/",
+  },
+};
+
+export default function Layout({ children }) {
+  return (
+    <PostLayout meta={meta} backHref="/blockchain" backLabel="Blockchain">
+      {children}
+    </PostLayout>
+  );
+}
+
+*Originally published in Farsi as «وب ۳ ( web 3.0 ) چیست؟» on **بلاک فارسی (BlockFarsi)** — the blockchain news & education outlet I ran — on November 12, 2018; translated to English for this site. Original text recovered via the [Wayback Machine](https://web.archive.org/web/2019/http://blockfarsi.com/web3/what-is-web3/).*
+
+## Web 3 | The decentralized web
+
+In the early 1990s, the World Wide Web transformed information. Ten years later the internet grew more mature & more programmable, and we witnessed the rise of so-called Web2, which brought social media and e-commerce platforms. It transformed social interactions, pulled producers & consumers of information, goods and services closer together, and let us enjoy P2P (peer-to-peer) interactions at global scale — but always with an intermediary: a platform acting as a trust broker between an A and a B who don't know or trust each other.
+
+In Web2, a platform acts as the trust intermediary between an A and a B who don't know or trust each other.
+
+While these platforms did wonders in building the P2P economy — surfacing an ever more sophisticated content layer — they also dictate all the rules of the transactions, and they own all of our data.
+
+### Bitcoin: blockchain's first application
+
+Against that backdrop, Blockchain looks like a driving force of the next generation of the internet — the decentralized web, or Web3. Blockchain technology can bring us true P2P transactions without intermediaries, and Bitcoin is its first use case.
+
+While Bitcoin is P2P money outside of banks & bank managers, the same technology that brought us Bitcoin can now enable:
+
+- ride-sharing without Uber
+- apartment-sharing without Airbnb
+- social media without Facebook & Twitter
+
+## Killing the server: redesigning data structures
+
+First we had computers; then we started connecting them to the internet. In the earliest days of personal computers, we stored data on a floppy disk, pulled it out, walked over to the colleague who needed the file, put the disk in their machine and copied the file over. Data was stored centrally on one physical device; to move data, copies had to be made. The internet made transferring those copies faster and slashed the transaction costs.
+
+Thirty years into mass internet adoption, our data architectures are still mostly client-server based — meaning our data is stored centrally on one computer and retrieved over the internet by another. Even as we live in an ever more connected world, one where a device like a toaster or a fridge is online too, data is still stored at the center: on our devices, on a USB stick, or even in the cloud.
+
+Which raises the trust questions: can I trust people & institutions to keep my data safe against every kind of internal & external corruption and manipulation — by human or machine, deliberate or accidental? Such centralized data structures have a single point of failure.
+
+### From data monarchy to data democracy
+
+P2P data architectures have existed since the 1990s, becoming famous through file-sharing applications like BitTorrent and the Tor browser. Blockchain — combined with cryptography and game-theoretic incentive mechanisms — has taken P2P architecture to a new level. We can now move from the centralized data structure, where everything is stored on one central computer, toward decentralized or fully distributed data architectures.
+
+In Web3, given that we live in a connected world, we are redefining the structure of data. It's important to note that blockchain is only one of the many technologies in this decentralized-web category. While a blockchain is an excellent P2P method for recording who did what & when, it is unsuitable for storing large amounts of data, for two reasons:
+
+- Scalability: blockchains are very slow
+- By design, they don't allow privacy. Never store your private data on a blockchain.
+
+## The Web3 technology stack
+
+As with building a web or mobile application, building a decentralized application (dApp) typically needs a few things:
+
+- compute
+- file storage
+- external data
+- monetization
+- payments
+
+The community has made a lot of progress over the past four years in building out the ecosystem. While building a dApp was borderline impossible in 2014, by 2017 it became feasible to build a basic decentralized application needing minimal compute & file storage.
+
+The Web3 ecosystem has come a long way toward a technology stack capable of producing decentralized applications.
+
+### The future of the internet
+
+The passage from the client-server internet to the decentralized web will be gradual rather than radical. As the decentralized-web stack is still maturing, the shift looks like going from centralized to semi-decentralized to fully decentralized. Moreover, it's important to note that while decentralized architectures are more fault-tolerant & attack-resistant, they are still slow.
+
+While the future internet is likely to be more decentralized, that does not mean we'll rid ourselves of centralized systems entirely. Centralized systems have their advantages and will probably prevail — but only for specific use cases.
