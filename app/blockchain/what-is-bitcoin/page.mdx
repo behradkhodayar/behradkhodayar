@@ -1,0 +1,55 @@
+import PostLayout from "../../ai/components/PostLayout";
+
+export const meta = {
+  title: "What is Bitcoin?",
+  date: "2018-11-17",
+  tags: ["Bitcoin", "Tutorial", "BlockFarsi"],
+};
+
+export const metadata = {
+  title: meta.title,
+  description:
+    "bitcoin-the-currency vs Bitcoin-the-protocol, and how a bankless money differs from fiat. Translated from the BlockFarsi archive.",
+  alternates: {
+    canonical: "https://behrad.khodayar.me/blockchain/what-is-bitcoin/",
+  },
+};
+
+export default function Layout({ children }) {
+  return (
+    <PostLayout meta={meta} backHref="/blockchain" backLabel="Blockchain">
+      {children}
+    </PostLayout>
+  );
+}
+
+*Originally published in Farsi as «بیتکوین چیست؟» on **بلاک فارسی (BlockFarsi)** — the blockchain news & education outlet I ran — on November 17, 2018; translated to English for this site. It was a living document; the [Wayback Machine](https://web.archive.org/web/2019/http://blockfarsi.com/tutorial/%d8%a8%db%8c%d8%aa%da%a9%d9%88%db%8c%d9%86-%da%86%db%8c%d8%b3%d8%aa%d8%9f/) snapshot captures it as of early 2019.*
+
+Given how much Bitcoin has recently been on everyone's lips in our society, a very diverse slice of the public is the potential audience of this article. So, to avoid wasting our dear readers' time & patience, we've split the article into sections so everyone can read according to their background and the question that made them curious. Check the links below and pick what suits you:
+
+- A brief description of Bitcoin
+- The technical explanation (how does Bitcoin work?)
+- Buying & selling bitcoin (how can I buy bitcoin?)
+- Bitcoin wallets (how to store bitcoin)
+
+## A brief description of Bitcoin
+
+Bitcoin is a particular kind of digital currency called a cryptocurrency. Put simply, bitcoin is a kind of money — exactly like Iran's rial, the EU's euro or the US dollar — with the difference that it belongs to no country: it is a global currency. So far we've only talked about bitcoin's monetary function; if you read technical literature, know that when authors mean the monetary function, they write it lowercase: **bitcoin**.
+
+Bitcoin is an international cryptocurrency.
+
+Beyond that, Bitcoin is a protocol — in other words, a distributed network that maintains a ledger of the account state of every bitcoin holder and every transaction that has ever happened on the network since its genesis. Again, in the technical literature, when authors mean the distributed network, they capitalize it: **Bitcoin**.
+
+### How Bitcoin differs from traditional currencies (like the rial)
+
+You might now ask yourself: with all the existing currencies (which, in contrast to cryptocurrencies, we call fiat currencies), what was the need for yet another one?
+
+The core difference is in how currencies are administered. As you know, for managing liquid assets humanity has so far critically depended on banks — and banks charge people fees for that management. Bitcoin took shape with this dream in its creators' minds: given the growth of the global internet and the ease of access it created, to build a currency whose management & governance rests in the hands of its holders — not banks (whether countries' central banks or any other).
+
+How does that holder-run management happen? Through Bitcoin's distributed network, mentioned earlier.
+
+Bitcoin — unlike traditional currencies, which are controlled & managed by banks — is managed by bitcoin holders (the general public).
+
+What do we mean by management & control? As you know, when you want to deposit (fiat) money into someone's account, you have to go to a bank or one of the banks' apps and transfer the amount; same when you want a statement or to check your balance.
+
+With Bitcoin the situation is different: the network we described — whose management & control is in your own hands — takes care of all of it: checking balances, statements, transferring funds between members & so on. You no longer need a third party like a bank to be responsible for looking after your accounts and liquid assets. And that is Bitcoin's greatest gift.

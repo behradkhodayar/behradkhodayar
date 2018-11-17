@@ -8,6 +8,14 @@ import { type Post, byDateDesc } from "../lib/content";
 
 export const posts: Post[] = [
   {
+    slug: "what-is-bitcoin",
+    title: "What is Bitcoin?",
+    date: "2018-11-17",
+    excerpt:
+      "bitcoin-the-currency vs Bitcoin-the-protocol, and how a bankless money differs from fiat. Translated from my Farsi outlet, بلاک فارسی (BlockFarsi).",
+    tags: ["Bitcoin", "Tutorial", "BlockFarsi"],
+  },
+  {
     slug: "what-is-web3",
     title: "What is Web3?",
     date: "2018-11-12",
