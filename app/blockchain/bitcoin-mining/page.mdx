@@ -1,0 +1,68 @@
+import PostLayout from "../../ai/components/PostLayout";
+
+export const meta = {
+  title: "Bitcoin Mining",
+  date: "2018-12-06",
+  tags: ["Bitcoin", "Mining", "BlockFarsi"],
+};
+
+export const metadata = {
+  title: meta.title,
+  description:
+    "What mining actually is, how blocks & hashes verify transactions, why ASICs won, and how to pick mining hardware. Translated from the BlockFarsi archive.",
+  alternates: {
+    canonical: "https://behrad.khodayar.me/blockchain/bitcoin-mining/",
+  },
+};
+
+export default function Layout({ children }) {
+  return (
+    <PostLayout meta={meta} backHref="/blockchain" backLabel="Blockchain">
+      {children}
+    </PostLayout>
+  );
+}
+
+*Originally published in Farsi as «استخراج بیت کوین» on **بلاک فارسی (BlockFarsi)** — the blockchain news & education outlet I ran — on December 6, 2018; translated to English for this site. Original text recovered via the [Wayback Machine](https://web.archive.org/web/2019/http://blockfarsi.com/articles/%d8%a7%d8%b3%d8%aa%d8%ae%d8%b1%d8%a7%d8%ac-%d8%a8%db%8c%d8%aa-%da%a9%d9%88%db%8c%d9%86/).*
+
+## Abstract
+
+Bitcoin mining is a computational process used to verify the validity of transactions made with Bitcoin. Mining bitcoins is, in effect, the process of checking other Bitcoin transactions — work that users are rewarded for. Mining is what keeps transactions secure and earns investors' trust. Over time the mining process keeps ramping up; today, mining is done on specialized hardware called ASICs.
+
+## Bitcoin mining
+
+Bitcoins are sent between users over the Bitcoin network, and the records of these transactions over a time window are kept in a list called a block. Mining is the mechanism for confirming those transactions, and every miner receives a reward for it.
+
+When a block of transactions is created, miners take that block and apply mathematical formulas to it, producing a short pattern of letters & numbers called the Bitcoin hash. Each new block is produced using the hash of the block before it. This process — also called sealing the blocks — is how a block's validity is detected & confirmed.
+
+Overall, the Bitcoin mining flow consists of:
+
+- A completed transaction is added to a block.
+- Miners verify the transaction's validity.
+- After mining, the header of the newest block is picked up by miners and the new bitcoin enters the new block as a hash.
+- Miners obtain a new bitcoin by solving the mathematical puzzles.
+- When the solution is found, the new block is appended to the chain of blocks and then propagated across the Bitcoin network.
+
+## Technologies used for mining Bitcoin
+
+Bitcoin mining has boomed as a profitable venture, and its returns scale with the power of the hardware used to solve the math. Classic computers used to be enough; today, given the fierce competition, technologies like CPUs, ATI graphics cards and FPGA chips are obsolete — you can no longer mine bitcoin profitably with them.
+
+So ASIC is the only technology that can still bring you meaningful returns. An ASIC is a chip specialized for one particular computation.
+
+## How to choose the right mining hardware
+
+Before picking the best ASIC for Bitcoin mining, evaluate the following and choose hardware that fits your needs:
+
+### Hash rate
+
+Hashes per second matter enormously and directly drive how fast the computation runs.
+
+### Efficiency
+
+The efficiency of mining hardware also depends on its power draw.
+
+### Price
+
+Hardware price is a major factor in your initial investment and your final profit. By working out the profitability of a given unit you can estimate your required costs and choose suitable hardware.
+
+Always remember: for investing in any field, studying every angle & every factor involved in how that business operates and performs is critical — as the saying goes, never wade into water without knowing its depth!
