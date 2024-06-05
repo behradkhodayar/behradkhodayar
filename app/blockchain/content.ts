@@ -8,6 +8,14 @@ import { type Post, byDateDesc } from "../lib/content";
 
 export const posts: Post[] = [
   {
+    slug: "demystifying-account-abstraction",
+    title: "Demystifying Account Abstraction",
+    date: "2024-06-05",
+    excerpt:
+      "A brief covering of the approaches to Account Abstraction on Ethereum — why AA at all, its history since 2016, and the notable proposals from EIP-2938 & ERC-4337 to EIP-7702 & ERC-7579.",
+    tags: ["Ethereum", "Account Abstraction", "Web3"],
+  },
+  {
     slug: "bitcoin-mining",
     title: "Bitcoin Mining",
     date: "2018-12-06",

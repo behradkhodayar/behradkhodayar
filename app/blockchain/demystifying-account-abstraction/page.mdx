@@ -1,0 +1,135 @@
+import PostLayout from "../../ai/components/PostLayout";
+
+export const meta = {
+  title: "Demystifying Account Abstraction",
+  date: "2024-06-05",
+  tags: ["Ethereum", "Account Abstraction", "Web3"],
+};
+
+export const metadata = {
+  title: meta.title,
+  description:
+    "A brief covering of the approaches to Account Abstraction on Ethereum — why AA at all, its history since 2016, and the notable proposals from EIP-2938 & ERC-4337 to EIP-7702 & ERC-7579.",
+  alternates: {
+    canonical: "https://behrad.khodayar.me/blockchain/demystifying-account-abstraction/",
+  },
+};
+
+export default function Layout({ children }) {
+  return (
+    <PostLayout meta={meta} backHref="/blockchain" backLabel="Blockchain">
+      {children}
+    </PostLayout>
+  );
+}
+
+*Originally published on [Paragraph](https://paragraph.com/@behkod/demystifying-account-abstration) (June 5, 2024) & republished on [Medium](https://behradkhodayar.medium.com/demystifying-account-abstraction-a816e052b026) (July 17, 2024).*
+
+## What is Account Abstraction?
+
+Account abstraction refers to all the efforts which aim to improve the flexibility and functionality of accounts.
+
+> Why is it called Account Abstraction? Because it involves decoupling the logic of accounts from the protocol itself, allowing for more complex & customizable account behavior.
+
+Account Abstraction allows/will-enable users to use smart contracts as their accounts. The default account for most users is just a private key. Unfortunately private keys require users to know a lot about how the underlying blockchain works to use them, thus imposing unnecessary complexities & barriers to entry for mass adoption.
+
+## Why Account Abstraction at all?
+
+Pre-AA types of accounts (EOA & Smart Contracts) on Ethereum have some limitation. Both types of accounts have fixed roles and responsibilities, limiting innovation and UX improvements. Account Abstraction aims to unify the two types of accounts and allow for more sophisticated account behavior resulting in a way better UX, Security & new capabilities, including but not limited to:
+
+**UX:**
+
+- Better onboarding with paying or pre-paying gas on behalf of users & more delightful UX with the ability to pay fees(gas) in tokens.
+- Better onboarding new users without the need for seed phrases.
+- Multi-operation transactions (Less Explicit Transactions) with TX batching (for example abstracting away the ERC20 explicit approvals in wallets).
+
+**Security:**
+
+- Account Recovery with social recovery & key rotation without moving funds.
+- More efficient, simpler, and quantum-safe signature algorithms. Support for more signatures with alternative curves/algorithms.
+
+**New Functionalities:**
+
+- Customizable Transaction Logic: Users can define custom logic for transaction validation and execution, moving away from the rigid structure imposed by the protocol.
+- Programmable Account Behavior: Allowing for complex account behaviors directly, such as automated payments, subscription models, or conditional transactions.
+- Upgradeability
+
+## History
+
+An interesting fact about AA that many in Ethereum ecosystem aren't aware of, is that Ethereum was meant to launch with native Account Abstraction & efforts related to this concern dates back to 2016. Here is a brief history of all the AA related EIPs:
+
+- **2016:** EIP-86 / EIP-208: Abstracting signature/nonce checking
+- **2017:** Trade-offs in AA proposals by Vitalik: PAYGAS, Entry point
+- **2018:** EIP-1014: Forwarding contracts from EIP-86 would be deployed to a specific address based on their code, introducing the idea that would later evolve to become EIP-1014, proposing the CREATE2 opcode.
+- **2020:** EIP-2938: Account Abstraction
+- **2020:** EIP-3074: AUTH & AUTHCALL / EIP-5003: AUTHUSURP / EIP-7377: Converting EOA to SAs
+- **2021:** ERC-4337: Account Abstraction using Alternate Mempool (no protocol change)
+- **2022:** ERC-5189: Account Abstraction via endorsed operations (no protocol changes), but universal
+- **2023:** RIP-7560: Native Account Abstraction (Combining EIP-2938 & ERC-4337)
+- **2024:** EIP-3074 [activated again] & EIP-7702: Setting one-time EOA account code
+- **2024:** EIP-7701: Native Account Abstraction with EOF
+
+## Account Abstraction via L2s — Another frontier
+
+Introducing core protocol changes tends to be a big blocker in the process of introducing any EIP related to account abstraction. But L2 chains that have been developed in the past years don't have the technical debt of Ethereum L1 and could introduce account abstraction out of the box. So, they did implement this in their own way, for example:
+
+- Optimism uses its own OVM with opcodes that replace the EVM ones to allow full compatibility. In their first version they also implemented a basic form of Account abstraction by introducing three new functions in their execution manager that provide users with upgradeable smart contract wallets. Although very promising, they were removed in the second version in an effort to become identical to the EVM and for security concerns.
+- StarkNet (The ZK rollup) has its own implementation of account abstraction.
+- Argent, the L1 smart contract wallet has recently released the ArgentX, a version of their wallet on StarkNet using a custom implementation of account abstraction heavily inspired by EIP-4337.
+- There is also a list of tools making AA available for Base.
+
+## Notable Approaches
+
+### EIP-2938: Account Abstraction
+
+**Description:** Account abstraction (AA) allows a contract to be the top-level account that pays fees and starts transaction execution. Proposes changes to the Ethereum protocol to support account abstraction by allowing users to deploy accounts that have custom logic for validating and executing transactions. It introduces a new transaction type that separates the concept of a "sender" from an "executor."
+
+**Status:** Stagnant · **Standards Track:** Core
+
+### ERC-4337: Account Abstraction Using Alt Mempool
+
+**Description:** Completely avoids the need for consensus-layer protocol changes. Instead of adding new protocol features and changing the bottom-layer transaction type, this proposal instead introduces a higher-layer pseudo-transaction object called a `UserOperation`. Users send `UserOperation` objects into a separate mempool. A special class of actor called bundlers package up a set of these objects into a transaction making a `handleOps` call to a special contract, and that transaction then gets included in a block.
+
+**Status:** Draft · **Standards Track:** ERC
+
+### EIP-3074: AUTH and AUTHCALL Opcodes
+
+**Description:** Introduces two new EVM opcodes, `AUTH` and `AUTHCALL`, to enable meta-transactions and other advanced transaction types. These opcodes allow a contract to assume the identity of an externally owned account (EOA) and execute transactions on its behalf.
+
+**Status:** Review · **Standards Track:** Core
+
+### RIP-7560: Native Account Abstraction
+
+**Description:** An account abstraction proposal that introduces consensus-layer protocol changes, instead of relying on higher-layer infrastructure, basically combining the EIP-2938 and ERC-4337 into a comprehensive Native Account Abstraction proposal. It is intended to be an enshrinement of ERC-4337 standard for rollups.
+
+**Status:** Draft · **Standards Track:** Core
+
+### EIP-7702: Set EOA account code for one transaction
+
+**Description:** Add a new transaction type that adds a `contract_code` field and a signature, and converts the signing account (not necessarily the same as the `tx.origin`) into a smart contract wallet for the duration of that transaction. Intended to offer similar functionality to EIP-3074. Even though this is an in-protocol change, its a TX type & can be easily deprecated in the future. This has a great compatibility with ERC-4337. You can validate signatures through EIP-1271\* [Standard Signature Validation Method for Contracts].
+
+**Status:** Draft · **Standards Track:** Core
+
+\*Contracts can't sign messages, but they can implement their own signature validation logic for their own signature format. So, if it is a contract account, it can define a standard in which the messages are validated.
+
+```solidity
+contract ERC1271 {
+  function isValidSignature(
+      bytes32 _hash,
+      bytes memory _signature)
+      public view returns (bytes4 magicValue);
+}
+```
+
+### ERC-7579: Minimal Modular Smart Accounts
+
+**Description:** Modular smart account interfaces and behavior for interoperability with minimal restrictions for accounts and modules. This proposal outlines the minimally required interfaces and behavior for modular smart accounts and modules to ensure interoperability across implementations. For accounts, the standard specifies execution, config and fallback interfaces as well as compliance to ERC-165 and ERC-1271. For modules, the standard specifies a core interface, module types and type-specific interfaces.
+
+**Status:** Draft · **Standards Track:** ERC
+
+## References
+
+- Demystifying AA at DappCon24
+- Are Intents, SUAVE, AA & Cross-chain bridging all the same thing?
+- The History & Future of Account Abstraction
+- Awesome Account Abstraction
