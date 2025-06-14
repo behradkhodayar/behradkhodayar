@@ -1,0 +1,30 @@
+import PostLayout from "../../ai/components/PostLayout";
+
+export const meta = {
+  title: "Zsh plugin of Nest.js CLI tool",
+  date: "2025-06-14",
+  tags: ["Zsh", "NestJS", "CLI"],
+};
+
+export const metadata = {
+  title: meta.title,
+  description:
+    "nestcli-zsh: a Zsh completion plugin for the Nest.js CLI with full coverage of commands, subcommands & options.",
+  alternates: {
+    canonical: "https://behrad.khodayar.me/dev-tools/nestcli-zsh/",
+  },
+};
+
+export default function Layout({ children }) {
+  return (
+    <PostLayout meta={meta} backHref="/dev-tools" backLabel="Dev Tools">
+      {children}
+    </PostLayout>
+  );
+}
+
+*Originally posted on [r/nestjs](https://www.reddit.com/r/nestjs/comments/1lbl2cc/zsh_plugin_of_nestjs_cli_tool/) (June 14, 2025).*
+
+Just built & shared a Nest.js CLI tool plugin for the ZSH ecosystem with full coverage of commands, subcommands & options. (e.g. `nest generate ...`, `nest build --preserveWatchOutput`)
+
+Grab it here: **[behradkhodayar/nestcli-zsh](https://github.com/behradkhodayar/nestcli-zsh)**.
