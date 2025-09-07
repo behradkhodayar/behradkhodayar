@@ -1,0 +1,319 @@
+import PostLayout from "../../ai/components/PostLayout";
+
+export const meta = {
+  title: "How to Avoid Cold Starts in Rental GPU Dev Env [Hybrid Volumes Guide]",
+  date: "2025-09-07",
+  tags: ["GPU", "Infra", "Automation"],
+};
+
+export const metadata = {
+  title: meta.title,
+  description:
+    "A pragmatic, provider-agnostic architecture for short cold-starts on rented GPUs — pre-baked images, hybrid volumes, S3-canonical state & GitHub Actions automation, with Runpod.io & Vast.ai as concrete examples.",
+  alternates: {
+    canonical: "https://behrad.khodayar.me/dev-tools/gpu-dev-env-cold-starts/",
+  },
+};
+
+export default function Layout({ children }) {
+  return (
+    <PostLayout meta={meta} backHref="/dev-tools" backLabel="Dev Tools">
+      {children}
+    </PostLayout>
+  );
+}
+
+*Originally published on [LinkedIn](https://www.linkedin.com/pulse/how-avoid-cold-starts-rental-gpu-dev-env-hybrid-volumes-khodayar-d4y0f) (September 7, 2025) under the full title "How to Avoid Cold Starts in Rental GPU Dev Env [Hybrid Volumes Guide - Runpod.io + Vast.ai]".*
+
+Nowadays, it's not uncommon to find yourself in a situation that requires powerful infrastructure—especially GPUs. Many of you might own a gaming laptop or workstation, but your/my 40/50/../90-series card is nothing compared to H100s and H200s.
+
+Of course, the solution isn't spending $30K on a GPU for home use. Instead, you turn to cloud or marketplace services. But there's a common challenge when doing so: **The Cold Start**.
+
+### What is Cold Start?
+
+GPU cold starts commonly come from image pulls, many pip/conda installs, dataset copy, and model weight loads.
+
+You obviously want short cold-starts without paying all the time for expensive GPU time. Below I'll give a pragmatic, somehow provider-agnostic architecture you may find useful. To provide a practical solution, I need to provide concrete examples, so I'll be using [Runpod.io](https://runpod.io) **(network persistence)** and [Vast.ai](https://vast.ai) **(local)**, and a list of other options / trade-offs.
+
+## TL;DR
+
+Keep *state* (code, dependencies, model/artifacts, caches) in fast persistent storage + pre-baked container images, use small automation to sync snapshots between providers (or to S3/MinIO), and use provider APIs/`onstart` scripts to pre-warm on start. Runpod network volumes help on Runpod side; Vast volumes are local-to-host and need syncing/cloning or a central object store to be truly portable.
+
+## High-level architecture (recommended)
+
+- **Code & containers**
+- **Artifacts & datasets**
+- **Fast persistent workspace**
+- **Orchestration & automation**
+
+## Why these pieces?
+
+Pre-baked images + on-disk model artifacts + lazy-loading/prewarming significantly reduce cold-start time. Baking and lazy loading are industry best-practices.
+
+## Concrete step-by-step (Runpod ⇄ Vast.ai)
+
+### 1) Prepare immutable artifacts
+
+- Build & push a Docker image that contains CUDA, system libs, and *most* Python packages (only the parts that take long).
+- Put large models / datasets into S3 or MinIO under well-versioned paths: `s3://my-bucket/projectX/weights/v1/`
+
+### 2) Runpod.io side (fast persistent & reusable)
+
+- Use Runpod **network volumes** for workspace / caches since they persist across Pod terminations and can be reattached. Mount at `/workspace` so your bakes and cached wheels survive. This is the fastest way on Runpod to preserve state between rentals.
+- Use `runpodctl` or the Runpod API to start/stop pods on demand and schedule short keep-alive runs if needed.
+
+### 3) Vast.ai side (spot/cheap offers)
+
+- On Vast, **create a volume** during instance launch (or attach an existing volume). Remember: the volume is local to that host; it won't automatically move to another host. Use the Vast UI/CLI to create volumes.
+- Put a small `onstart` script at `/root/onstart.sh` (Vast executes it on container start).
+
+### 4) Keep Runpod and Vast in sync (workflow patterns)
+
+You have two common strategies:
+
+**A — Central S3/MinIO canonical storage (recommended)**
+
+- Always push model artifacts, checkpoints and important caches to S3 before shutting down an instance.
+- On new instance start (Runpod or Vast), `aws s3 sync` the small working set or use range requests for larger files.
+- Pros: portable, straightforward, works across providers.
+- Cons: initial restore still needs network transfer; you can mitigate by keeping only frequently used items on fast network volumes.
+
+**B — Try to reuse provider-local volumes when possible**
+
+- Use Runpod network volumes for persistent caches you access from Runpod runs.
+- For Vast, if you rent the *same* host repeatedly and have a long-living volume there, you can reuse it; otherwise clone volumes (Vast supports cloning) or copy to S3. But cloning is host-specific and not a general cross-host solution. ([Vast Docs](https://docs.vast.ai/volumes))
+
+**Automation flow example (GitHub Action / tiny controller)**
+
+- On `git push` or via UI, controller decides: start `runpod` or `vast` instance.
+- If using Vast, controller launches instance, passes environment vars, and uploads a "start marker" to S3.
+- After instance up, `onstart` pulls Docker image and does `s3 sync s3://my-bucket/projectX/working/ /data`.
+- When instance is about to stop (or periodically), run script to `aws s3 sync /data s3://my-bucket/projectX/working/`.
+
+## Example: basic scripts & commands (sketches)
+
+### Vast: create a volume & instance (conceptual)
+
+```bash
+# create a volume (via vast CLI)
+vastai create volume <offer-id> size_in_gb name=mywork
+
+# create instance referencing that volume
+vastai create instance <offer-id> image=myorg/dev-pytorch:cuda \
+  env 'VAST_S3_BUCKET=my-bucket' disk 30 \
+  # sample flags - use current Vast CLI docs for exact flags
+```
+
+### Runpod: use network volume and API
+
+```bash
+# configure
+runpodctl config --apiKey RUNPOD_API_KEY
+
+# create pod (conceptual JSON) referencing networkVolume
+# Use runpod docs/console to attach network volume and schedule/predict jobs
+```
+
+### Sync to S3 (both sides)
+
+```bash
+# from instance before shutdown
+aws s3 sync /data s3://my-bucket/projectX/working/ --delete
+
+# on startup
+aws s3 sync s3://my-bucket/projectX/working/ /data --exclude 'big-unused/*'
+```
+
+## Other known options / alternatives (pros & cons)
+
+- **Keep one cheap always-on "orchestrator" / cache host**
+- **Use managed inference/endpoints**
+- **Reserve or hibernate-capable instances (AWS / Azure)**
+- **Kubernetes with node-pools and local PVs**
+- **Keep pre-warmed container images / snapshot layers**
+- **Provider alternatives:** Paperspace, Lambda Labs, CoreWeave, Gradient — these have different pricing and persistence features; some offer long-lived volumes or "workspaces" that are cheaper to keep warm.
+
+## Caveats & tips (practical)
+
+- **Vast volumes are local to physical host** — don't rely on being able to attach the same volume on an arbitrary different host; clone or sync to S3 for portability.
+- **Push heavy work into baked images** (system libs + wheels) — that saves many minutes.
+- **Prewarm step:** have a tiny script that loads a micro-batch through the model or warms caches; it's fast and avoids the first-sample slowdown.
+- **Cost vs convenience:** retaining state (keeping instances up or volumes attached) costs money — balance the cost of warm-up time vs the cost of reserving/keeping things warm.
+
+## More Automation
+
+So far so good...
+
+Now let's go even a step further & build a **GitHub Actions workflow** that automates:
+
+- Starting/stopping GPU instances (Runpod.io or Vast.ai) via their APIs/CLI.
+- Syncing your workspace (checkpoints, logs, model weights) with **S3/MinIO**.
+- Running a **prewarm script** so your environment is ready immediately.
+
+this way you'll be actually implementing the following flow:
+
+- You trigger the workflow in GitHub → choose `provider=runpod` or `vast`, `task=train|predict|dev`.
+- Workflow calls the provider API → spins up a GPU container.
+- You SSH or VSCode-remote into the running instance to continue work.
+- Before instance ends, `sync_to_s3.sh` runs (can be cron or manual).
+- Next time, repeat — all cached state reloaded in minutes.
+
+## Prerequisites
+
+- **Docker image** pushed to a registry (DockerHub/GHCR/etc.) with CUDA + Python + your frameworks pre-baked.
+- **S3/MinIO bucket** for persistent artifacts.
+- **Secrets configured in GitHub.**
+
+## A Sample Repo structure
+
+```
+.
+├── .github/workflows/
+│   └── gpu-job.yml      # automation workflow
+├── scripts/
+│   ├── prewarm.py       # warmup (load model once)
+│   ├── start_runpod.py  # Python script to call Runpod API
+│   ├── start_vast.py    # Python script to call Vast API
+│   ├── sync_to_s3.sh    # sync workspace -> S3
+│   └── sync_from_s3.sh  # restore workspace from S3
+```
+
+## Example GitHub Actions workflow
+
+```yaml
+name: GPU Job Automation
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: "GPU provider (runpod or vast)"
+        required: true
+        default: "runpod"
+      task:
+        description: "Task to run (train, predict, dev)"
+        required: true
+        default: "train"
+
+jobs:
+  gpu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install requests boto3
+
+      - name: Start GPU instance
+        run: |
+          if [ "${{ github.event.inputs.provider }}" = "runpod" ]; then
+            python scripts/start_runpod.py \
+              --task "${{ github.event.inputs.task }}"
+          else
+            python scripts/start_vast.py \
+              --task "${{ github.event.inputs.task }}"
+          fi
+        env:
+          RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+          VAST_API_KEY: ${{ secrets.VAST_API_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+```
+
+## Example Runpod starter script (sketch: scripts/start_runpod.py)
+
+```python
+import os, requests, json, time
+
+RUNPOD_ENDPOINT = "https://api.runpod.io/graphql"
+
+def start_pod(task: str):
+    query = """
+    mutation LaunchPod($input: PodInput!) {
+      podFindAndDeployOnDemand(input: $input) {
+        id
+        environment
+        imageName
+      }
+    }
+    """
+    variables = {
+        "input": {
+            "cloudType": "ALL",
+            "gpuTypes": ["A100"],
+            "imageName": "myorg/dev-pytorch:cuda",
+            "volumeInGb": 20,
+            "env": [
+                f"TASK={task}",
+                f"AWS_ACCESS_KEY_ID={os.getenv('AWS_ACCESS_KEY_ID')}",
+                f"AWS_SECRET_ACCESS_KEY={os.getenv('AWS_SECRET_ACCESS_KEY')}",
+                f"AWS_DEFAULT_REGION={os.getenv('AWS_DEFAULT_REGION')}",
+            ],
+            "startScript": "bash /workspace/scripts/sync_from_s3.sh && python /workspace/scripts/prewarm.py"
+        }
+    }
+    headers = {"Authorization": f"Bearer {os.environ['RUNPOD_API_KEY']}"}
+    r = requests.post(RUNPOD_ENDPOINT, json={"query": query, "variables": variables}, headers=headers)
+    print(r.json())
+
+if __name__ == "__main__":
+    start_pod(task=os.getenv("TASK", "train"))
+```
+
+## Example Vast starter script (sketch: scripts/start_vast.py)
+
+```python
+import os, requests, json
+
+VAST_API = "https://vast.ai/api/v0"
+
+def start_instance(task: str):
+    # Minimal example; in reality you'd query offers first
+    offer_id = 123456
+    payload = {
+        "client_id": os.getenv("VAST_API_KEY"),
+        "image": "myorg/dev-pytorch:cuda",
+        "disk": 30,
+        "onstart": "bash /workspace/scripts/sync_from_s3.sh && python /workspace/scripts/prewarm.py",
+        "env": {
+            "TASK": task,
+            "AWS_ACCESS_KEY_ID": os.getenv("AWS_ACCESS_KEY_ID"),
+            "AWS_SECRET_ACCESS_KEY": os.getenv("AWS_SECRET_ACCESS_KEY"),
+            "AWS_DEFAULT_REGION": os.getenv("AWS_DEFAULT_REGION"),
+        }
+    }
+    r = requests.post(f"{VAST_API}/instances/create/{offer_id}/", json=payload)
+    print(r.json())
+
+if __name__ == "__main__":
+    start_instance(task=os.getenv("TASK", "train"))
+```
+
+## Example Sync scripts (sketch)
+
+`scripts/sync_from_s3.sh`:
+
+```bash
+#!/bin/bash
+set -e
+aws s3 sync s3://my-bucket/projectX/working/ /workspace/ --exclude 'big-unused/*'
+```
+
+`scripts/sync_to_s3.sh`:
+
+```bash
+#!/bin/bash
+set -e
+aws s3 sync /workspace/ s3://my-bucket/projectX/working/ --delete
+```
+
+---
+
+> ***No matter how expensive GPUs get, our most valuable asset remains time — and I hope these techniques help you save it.***
