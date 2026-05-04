@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Behrad Khodayar's personal homepage",
   description: "You don't loose anything without browsing this website.",
+  verification: {
+    google: "xF498x9x638tPHYCrBKGbBPGBRhbvvofRibN7Kl0LMQ",
+  },
 };
 
 export default function RootLayout({
