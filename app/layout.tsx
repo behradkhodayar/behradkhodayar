@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import TopNav from "./components/TopNav";
 import SeoContent from "./components/SeoContent";
+import ConsentBanner from "./components/ConsentBanner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -172,6 +173,7 @@ export default function RootLayout({
         <TopNav />
         <SeoContent />
         {children}
+        <ConsentBanner />
       </body>
     </html>
   );
