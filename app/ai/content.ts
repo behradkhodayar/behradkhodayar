@@ -22,6 +22,14 @@ export const posts: Post[] = [
       "A field guide to the classifiers wrapped around modern LLMs — security & jailbreak screens, prompt-injection probes, tool-risk & authorization gates, and the probabilistic classifier in front of Anthropic's Fable model.",
     tags: ["Classifiers", "Harnesses", "AI Safety"],
   },
+  {
+    slug: "how-i-actually-use-ai-every-day",
+    title: "How I Actually Use AI Every Day as a Software Engineer",
+    date: "2026-05-10",
+    excerpt:
+      "My field-tested setup for AI-assisted engineering: context management, skills, sub-agents, MCP, hooks & plan mode, spec-first development, dynamic workflows — and why verification is the skill that actually 10x's you.",
+    tags: ["Claude Code", "Agents", "Workflow"],
+  },
 ];
 
 export const projects: Project[] = [

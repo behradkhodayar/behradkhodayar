@@ -1,0 +1,283 @@
+import PostLayout from "../components/PostLayout";
+
+export const meta = {
+  title: "How I Actually Use AI Every Day as a Software Engineer",
+  date: "2026-05-10",
+  tags: ["Claude Code", "Agents", "Workflow"],
+};
+
+export const metadata = {
+  title: meta.title,
+  description:
+    "My field-tested setup for AI-assisted engineering: context management, skills, sub-agents, MCP, hooks & plan mode, spec-first development, dynamic workflows — and why verification is the skill that actually 10x's you.",
+  alternates: {
+    canonical: "https://behrad.khodayar.me/ai/how-i-actually-use-ai-every-day/",
+  },
+};
+
+export default function Layout({ children }) {
+  return (
+    <PostLayout meta={meta}>
+      {children}
+    </PostLayout>
+  );
+}
+
+*Originally published on [LinkedIn](https://www.linkedin.com/pulse/how-i-actually-use-ai-every-day-software-engineer-behrad-khodayar-oosze) (May 10, 2026).*
+
+After over a couple of years of using AI in whether my day to day job as a senior software engineer / team lead or to bringing my personal ideas & pet projects to life in a parallel adventure, I've learned a lot.
+
+I've lived the moments that I was pretty sure to go out & call that "Th AGI is here", I've also felt all this "is overhyped & only spitting out slop right & left"; manifestation of a true bi-polar at its finest in term's of how I feel about & see the future of AI-assisted software development.
+
+But this very moment that I get to write an article about a general concern in this field, despite the past 20 years in the field; is well self-explanatory about the tech: I've become much more productive; have got more spare time to live & dream about what to build next. So I guess by now, we've decided that I stand by my former feeling, rather the later one, for good.
+
+There has been lots of dramatic changes that truly sets apart how we used to do thing before & the way we're doing & will continue to do in the future. I can never go back to search for a solution through Stackoverflow (StackExchange) pages. I'd never read the full documentation of a library or API at first shot or unless necessary. Every day I'm finding myself browsing DuckDuckGo's search & listing pages less than I did yesterday.
+
+The 2025 to 2026 shift is the move from inline assistance (or pair programming) to autonomous, multi-step execution (i.e. "Delegated engineering") & as [@lalitwadhwa](https://www.linkedin.com/in/lalitwadhwa/) stated, Agentic AI will reshape engineering workflows in 2026. I'm pretty sure we're all on the same page about the "why" & "whether" to use AI (if still not sure, read [2025 DORA State of AI-assisted Software Development report](https://dora.dev/) to learn about the adoption rate); so, enough ranting! let's get to the math of the "how."
+
+This article is supposed to derive engagement from the community, so we can learn from each other; where I'm only sharing my personal/professional experience as a nobody. I'd make sure to extend my salute (even donations) to those of u sharing useful methods as well.
+
+### 0. Prerequisites / Fundamentals
+
+To my understanding, AI is an accelerator (as in DORA 2025: an amplifier), so it only "accelerates" everything based on the environment provided to it. So engineers/teams w/ strong fundamentals get faster & better; & engineers/teams w/ poor fundamentals get faster & worse! Put this besides the shift required in mindset of every engineer/team to adopt AI: U should provide the right environment to the AI model/tool(-set) to do its job, instead of telling it how to do what. This was my aha moment, when I first read it (Can't recall precisely, but I guess it was stated in the interface of an Antropic product / web docs).
+
+So, how does the right environment look like so it amplifies quality outcomes, instead of debts & liabilities? Following is my checklist:
+
+- Tests are fast & trustworthy. AI generates code in seconds; if tests take 20 minutes, ur feedback loop is broken. Aim for unit suites under 2 minutes.
+- CI is green by default. Flaky CI + AI-generated code is the new kind of Myth of Sisyphus, as the agent will "fix" issues that don't exist.
+- Version control discipline — Small commits, meaningful messages, branch protection. AI can churn diffs faster than u can review them.
+- Architecture allows isolated change. Tightly-coupled monoliths punish AI use disproportionately. Leaning towards decoupled & SOLID units is what I do more often than before. Think microservices & respect contracts. If a refactor would be a mess, an AI driven refactor will be a faster mess (remember the amplification?).
+- Baseline metrics captured. Cycle time, change failure rate, MTTR, PR review time. u cannot detect acceleration whiplash w/o a before picture.
+
+> Treat AI as a senior engineer employee of ur company, where u are the C-level guy, but:
+
+Not just to flood unclear list of todo's to it/him/her, but to provide the comfortable working environment for them, to interview them about the consequences of their decisions, to ask them explain their solutions & defend them.
+
+I'm Using Antropic's Claude Code & ecosystem around. I've tried lot's of tools & services in the past couple of years, from Github's integrated one in VSCode, to Agentic IDEs, to some pretty decent ones u get to use almost free of charge like [OpenCode.ai](https://opencode.ai) or [Openrouter.ai](https://openrouter.ai) for routing models used w/ [Kilo.ai](https://kilo.ai). Now fwiw I'm using Claude Max 5X which I'm happy w/.
+
+So, How do I do it? Whatever project I want to hand over to AI or pick its brain on, I make sure it has the right environment at its disposal, how? this is (roughly) my checklist:
+
+### 1. Manage Context Effectively (CLAUDE.md)
+
+> My personal analogy is: "Context is the king", is the new "Content is the king" of SEO era.
+
+Make sure context is managed best. context file contains universal facts that the agent should NEVER FORGET (commit conventions, never edit src/v1, ...). I always make sure I'm making best use of CLAUDE.md files at all of five main scopes (which are ordered from broadest to most specific) as follows:
+
+Each file is loaded at session start & more specific locations take precedence over broader ones.
+
+- Organization-wide rules (deploy & agreed upon at our co, can't be ignored):
+
+```
+/etc/claude-code/CLAUDE.md
+```
+
+- Project-wide rules (project conventions, build cmds, arch):
+
+```
+./CLAUDE.md or ./.claude/CLAUDE.md
+```
+
+- User rules (My personal preferences across every project):
+
+```
+~/.claude/CLAUDE.md
+```
+
+- Local rules (Personal project-specific notes (sandbox URLs, test data); should be .gitignored)
+
+```
+./CLAUDE.local.md
+```
+
+- Subdirectory rules (Which instead of loading them at launch, they are included when Claude reads files in those subdirectories)
+
+Please bare w/ me about the following couple of additional notes about managing context (specifically CLAUDE.md) & we're done w/ this part:
+
+- `.claude/rules/`: For larger projects, instructions can be split into topic files in `.claude/rules/`. Rules w/ a `paths:` frontmatter only load when Claude touches matching files. This is all about keeping the context window lean.
+- Auto memory (separate system): Claude writes its own learnings to `~/.claude/projects/<project>/memory/MEMORY.md`. This is machine-local & per-project, distinct from the CLAUDE.md hierarchy above.
+
+If u noticed the bold presence of the "keeping the context window lean", let's not downplay it's important! The quality of context window management is super important:
+
+> I make sure to keep my claude.md files under 150 line & make extensive use of /compact & /clear cmds in Claude Code interface.
+
+These 3 habits contribute a lot to issues caused by the model forgetting or skipping some rules. No matter how large is the context window of a model (~1m nowadays), u're not supposed to be occupying the whole window, make sure the model has only as much in its context as it needs, just like the way u need ur employee have a focused presence in ur company! So, clear up the sources of distractions. This housekeeping habit, will payback very well as early as of third, fourth command.
+
+### 2. Skills are more important than u think
+
+Skills are basically on-demand .md instruction files Claude autoloads when relevent. U write once & Claude pulls them in automatically when the task matches. Each one is a little markdown file (`SKILL.md`) sitting in `.claude/skills/<skill-name>/` inside ur repo, w/ a short description in the frontmatter that tells Claude when to use it.
+
+The killer feature: they're on-demand. Claude doesn't load every skill every time (so this is huge in terms of performance, avoiding hallucination & Claude's negligence every now & then. It scans the descriptions & only loads what's relevant to what u're doing. So u can have 42 skills (this number is huge! avoid it. more on this later) in ur repo & none of them bloat ur context window until they're actually needed.
+
+What I'd put in skills for my workflow:
+
+- PR review checklist: the exact things our team checks before merging (security, perf, naming, tests). Fires when I ask for a review.
+- Accessibility audit: WCAG checks for UI components. Fires when files in src/components/ are touched.
+- Migration playbook: how we handle DB migrations, what to never do, our rollback pattern. Fires when migration files are involved.
+- API conventions: our REST patterns, error shapes, pagination style.
+- Commit message format: enforces conventional commits before each commit.
+
+Then how do I know there should be a new skill? If I ever wrote the same instructions to Claude twice, that should've been a skill the first time. (Think refactoring code & extracting functions/classes)
+
+Skills > CLAUDE.md for anything I don't need every single turn. CLAUDE.md is always-on context, it costs tokens on every message. Skills only load when needed. Putting migration rules in CLAUDE.md is wasteful; making them a skill is free until I actually do a migration.
+
+I guess by now there's an urge in u to fire a new tab & look for somehow an awesome list of skills :-), followings are some sources I browse occasionally:
+
+- [github.com/anthropics/skills](https://github.com/anthropics/skills) (Anthropic's official): the canonical source. 16 first-party skills built by the team that built Claude Code itself: PDF, DOCX, XLSX, PPTX, MCP builder, frontend-design, skill-creator, etc. Highest signal-to-noise ratio u'll find anywhere. Start here before u go shopping at any marketplace.
+- [claudemarketplaces.com](https://claudemarketplaces.com) (aggregator): thousands of skills sorted by install count & GitHub stars. The closest thing to an "App Store" view. Useful when u know what category u want (testing, security, DevOps, frontend) & want to see what's popular. Ofc I'm sure u know that popularity ≠ quality & marketplaces accumulate abandonware(!) fast.
+- [claudeskills.info](https://claudeskills.info): hundreds of skills, prominently surfaces the official Anthropic ones alongside community contributions. Smaller than claudemarketplaces but better filtered. Better second stop if #1 doesn't have what u need.
+- [skillsmp.com](https://skillsmp.com): syncs from GitHub regularly & explicitly handles the fact that the SKILL.md spec is now an open standard so same skill works in Claude Code, Codex CLI, Cursor, ChatGPT, Gemini CLI, Copilot. Use this if ur team is multi-tool.
+- [lobehub.com/skills](https://lobehub.com/skills) (community ratings): aggregator w/ ratings & install counts. Nice for browsing what's trending right now. Search-first interface.
+- This is different: (Anthropic's skill-creator): walks u through an interactive Q&A & generates a complete skill directory. The most useful skill u'll ever install is the one u build for the workflow u keep re-explaining to Claude. After a couple of weeks of using other people's skills, u'll know what urs should look like.
+
+Before we move on to the skills, let me give a 3-habit list for skills as I did for context:
+
+> Keep number of skills ~10. that'd cover ur needs if well chosen. remember u're paying 100 tokens/skill for them to be discoverable (even when not fired). Audit ur skills monthly to remove the stale ones not using anymore & treat ur skills folder small, opiniated, version-controlled & ALWAYS SHRINKING BACK.
+
+My recommendation is to start w/ Anthropic's official 16, add 2-4 from a vendor pack relevant to ur stack (e.g. Vercel's if u do React/Next.js, Firecrawl's if u do scraping, etc.), build the rest urself w/ skill-creator. THEN SHRINK RELENTLESSLY.
+
+Skills vs. sub-agents (more on this later): skills run inside my current conversation; the work happens in front of me. Sub-agents run in a separate context: the work is hidden & only the summary comes back, so:
+
+> Skills when I want to see what's happening; sub-agents when I don't care about the noise.
+
+### 3. Sub-Agents: u're hiring a team now, not a clone
+
+I dangled sub-agents at the end of #2 like a cheap cliffhanger, so let's pay it off.
+
+A sub-agent is a separate Claude session the parent spins up to do one narrow job. Its own context window, its own tool list, its own permissions, even its own model if u want a cheaper one for grunt work. U launch it via the Task tool, it goes off & does its thing, & only the final summary comes back to u. The 4,000-line stack trace it waded through, the 15 grep hits, the three dead ends; all of that stays in the sub-agent's transcript & never lands in ur window.
+
+Remember my "treat AI as a senior engineer employee" analogy from #0? Sub-agents are where u stop being the C-level guy w/ one hire & start being the guy w/ a team. The parent is the staff engineer holding the plan in their head; the sub-agent is the contractor u bring in for one bounded task, who hands u a result & leaves. U don't want the contractor's entire mental scratchpad in ur head. U want the deliverable.
+
+Where they live, & who wins when names collide (broadest -> most specific, just like CLAUDE.md):
+
+- Session-defined: agents u spin up ad-hoc in the current session. Highest precedence.
+- Project: `.claude/agents/<name>.md`. Committed to the repo. This is where ur team's shared specialists go: the reviewer, the test-runner, the migration-writer. Everyone on the team gets the same ones.
+- User: `~/.claude/agents/<name>.md`. Ur personal toolbelt across every project.
+- Plugin: bundled & installed. Lowest precedence.
+
+Each one is a little markdown file w/ frontmatter (name, description, tools, model) & a system prompt in the body; same muscle memory as a skill. Claude also ships a few built-ins out of the box (general-purpose, Explore, Plan, statusline-setup), so u're not starting from zero.
+
+Now the part nobody tells u until u've already been bitten by it, so I'm bolding it:
+
+> A sub-agent CANNOT show u a permission prompt. If it calls a tool that matches an ask rule, the harness treats it as DENIED; not "pause & ask the human." The human (u) isn't in that sub-conversation to click "allow."
+
+The consequence is a design rule, not a footnote: give sub-agents read-only tool sets. Drop Edit, Write, NotebookEdit, & any mutating Bash from their frontmatter tools: list. Let them research, explore, review, report, & defer all the actual file-writing to the parent agent, who can still surface a prompt to u. A sub-agent that does recon & a parent that does surgery is the pattern that doesn't blow up in ur face. (Built-ins whose whole job is a narrow edit, like statusline-setup, are the exception, b/c their blast radius is tiny & predictable.)
+
+The other thing worth knowing & it's new as of this month (May 2026), is filesystem isolation via isolation: "worktree". The sub-agent runs in its own git worktree instead of ur working tree. Suddenly u can fan out genuinely parallel agents that don't trample each other's files. This is the bit that turns "sub-agents" from a context-management trick into a real parallelism primitive.
+
+So when do I actually reach for one?
+
+- Parallel exploration. "Search this codebase ten different ways at once." Ten sub-agents, ten answers, ur main thread stays clean.
+- Heavy-context detours. Anything that's going to drag a mountain of tokens into the window (log spelunking, dependency archaeology, reading a giant generated file) goes to a sub-agent so the mountain stays over there.
+- Scoped fresh-starts. A task that benefits from zero baggage & a clean prompt.
+
+Now the skills-vs-sub-agents line I promised:
+
+> Skills run on-stage, in ur conversation, where u watch the work happen. Sub-agents run off-stage, & only the summary walks back out.
+
+Skills when u want to see it; sub-agents when u don't care about the noise & just want the result.
+
+Now it's time for the 3-habit list for sub-agents:
+
+- Read-only by default: Strip write tools from every sub-agent unless u have a deliberate, narrow reason not to. The parent does the writing.
+- One job per agent: A sub-agent w/ a vague mandate burns context & tokens for a mushy summary. Scope it like u'd scope a ticket u actually want closed.
+- Commit the team-wide ones, keep them few: Ur project `.claude/agents/` is a shared contract; a reviewer, a test-runner, maybe a security auditor. Same discipline as skills: small, opinionated, version-controlled, always shrinking back.
+
+### 4. MCP: the USB-C of AI tooling
+
+If skills are how Claude knows how ur shop works, MCP (Model Context Protocol) is how Claude reaches the rest of ur world (ur database/Jira/Sentry/Slack/internal API/etc) w/o u writing a pile of bespoke glue for each one.
+
+Mental model: before MCP, every AI-to-tool connection was a one-off integration. Want the agent to read Postgres? Write an adapter. Now want it to read Slack too? Write another, shaped differently. It was the classic N×M glue problem. MCP is the one plug that fixes it; author a tool server once against the protocol, & any MCP-speaking agent can use it. USB-C for agents. Claude Code is an MCP client; it connects to these servers & exposes their tools to the model as if they were native.
+
+Here's the part that should make u sit up (it's the "why this matters" I can't resist): this stopped being an Anthropic thing. Anthropic shipped MCP in Nov 2024. Within a year OpenAI, Google DeepMind, Microsoft, AWS, & Salesforce had all adopted it. Then in Dec 2025 Anthropic donated the protocol to the Linux Foundation, so it's now vendor-neutral infrastructure rather than one company's pet standard. The takeaway one of the guides put bluntly & I agree w/: if u're building AI-assisted software in 2026 & not using MCP, u're quietly accumulating tech debt (A subset of recently coined term of AGENT DEBT!). It's the same open-standard wave that the SKILL.md spec is riding, just bigger & older.
+
+How u wire one into Claude Code:
+
+- Define servers in settings.json under mcpServers, or ship them per-project in a .mcp.json (gated by enabledMcpjsonServers so ur teammates opt in deliberately).
+- Pick a transport: stdio for a local binary/script, streamable-http for a remote server (this is the one to use for remote now), & sse which is deprecated; old configs still work for a release cycle, but don't start anything new on it. (WebSocket isn't a supported transport, fwiw, so don't go looking for it.)
+- Every tool a server exposes shows up as `mcp__<server>__<tool>` in the permission system, so u allow/deny/ask them exactly like native tools. `"allow": ["mcp__sentry"]` to trust a whole server, `"allow": ["mcp__sentry__get_issue"]` to trust one tool.
+- `/mcp` shows u every server's connection state & how many tools it's exposing. Check it before u rely on a server being up.
+
+Now the skeptic's half, b/c I'd be doing u a disservice w/o it:
+
+An MCP server is a dependency in ur supply chain. It runs w/ whatever credentials u hand it & it can dump whatever it returns straight into ur context window. Treat a random third-party MCP server exactly like u'd treat an npm package from a stranger (read the source, pin the version, scope the credentials to the minimum, & put the token in an env var (`${COMPANY_MCP_TOKEN}`) not in the committed config). A compromised or sloppy MCP server is a prompt-injection vector w/ ur API keys attached. This is not paranoia; it's the same instinct u already have about npm install.
+
+The other cost, which loops straight back to my obsession from #1: MCP tools eat ur context window. Every connected server's tool definitions sit in the window whether u call them or not. Connect 20 servers "just in case" & u've re-bloated the exact window u worked to keep lean. So:
+
+Here's the 3-habit list for MCP:
+
+- Connect what the task needs, nothing "just in case.": Tool defs are context. Same lean discipline as skills & CLAUDE.md.
+- Scope & secure every server: Least-privilege creds, env vars not literals, pinned versions, source u've actually looked at. It runs w/ ur keys.
+- Prefer the official/first-party server over the popular community fork: `Popularity ≠ trust`, & an MCP server has a much bigger blast radius than a skill (it's holding live credentials, not just instructions).
+
+### 5. Hooks, slash commands & plan mode: the part CLAUDE.md literally cannot do
+
+Here's a thing I had to learn the hard way & that reframes everything in #1: CLAUDE.md is a polite request. The model reads it & mostly complies. But "mostly" is exactly the word u don't want anywhere near an agent that's editing ur repo while u're getting coffee. CLAUDE.md instructs; it does not enforce. For enforcement u need deterministic code that runs no matter what the model felt like doing (& that's hooks).
+
+Hooks are shell commands the harness fires at fixed points in the session lifecycle. The events u care about: PreToolUse (before any tool runs), PostToolUse (after), UserPromptSubmit (when u hit enter), Stop (when the main agent finishes), SubagentStop, SessionStart/SessionEnd, & PreCompact/PostCompact. The killer one is PreToolUse, b/c it can block (exit code 2 from ur hook script & the harness aborts the tool call). That's a guardrail that the model cannot talk its way past.
+
+What I actually wire up:
+
+- A PreToolUse hook on Bash that vetoes the stuff that should never happen (rm -rf on anything that matters, a force-push to main, a DROP TABLE). The model "knowing" not to (via CLAUDE.md) is nice. The hook making it impossible is what lets me sleep.
+- A PreToolUse hook on Write that scans for secrets before they ever touch disk.
+- A PostToolUse hook on Edit|Write that runs prettier/eslint after every single edit, so I never once review an unformatted diff. The formatting just is correct by the time I look.
+- A Stop hook that runs the test suite the moment Claude declares victory, so "I'm done" & "the tests pass" are the same event.
+
+> The mental shift: hooks turn "please don't" into "can't." CLAUDE.md is the onboarding doc; hooks are the locks on the doors.
+
+Slash commands are the flip side: saved prompt templates u invoke on purpose w/ /&lt;name&gt;, living in .claude/commands/&lt;name&gt;.md w/ a little frontmatter (description, allowed-tools, model). These are the workflows u run constantly: the built-in /review (review the branch), /pr-comments (pull a PR's comments), plus ur own; a custom /ship that runs ur release checklist, a /triage that does ur first-pass bug workflow. If skills are "knowledge Claude pulls in when it's relevant," slash commands are "a button u press when u've decided."
+
+Plan mode is the one habit I'd tattoo on a junior if I could! Hit Shift+Tab twice (or launch w/ --permission-mode plan) & Claude drops into read-only: it can Read, Grep, Glob, search the web, spin up read-only sub-agents (but it cannot touch a file until it shows u a plan & u approve it). For anything non-trivial this is the highest-leverage move there is. U would not let a new hire start a database migration before they'd written a design doc & u'd nodded at it. Plan mode is that nod, enforced. Make it ur default for refactors & ambiguous tasks. Watching an agent type into ur codebase before it's told u what it intends is how u end up w/ a fast, confident mess.
+
+One more, b/c it's how all of the above gets shared: plugins. A plugin bundles skills + sub-agents + hooks + slash commands + MCP definitions into one versioned, installable unit (/plugin). This is how a team ships "our entire Claude setup" to every engineer at once, instead of fifteen people hand-assembling the same config & drifting apart by Friday.
+
+> Same supply-chain caution as MCP applies: a plugin runs inside ur harness, so treat third-party ones like any other dependency.
+
+### 6. Spec-first: the spec is the new source of truth
+
+2025 gave us a meme & a warning at the same time: vibe coding. Chat vaguely at the agent, hope it guesses ur intent, get 400 lines back where half of them solve a problem u didn't have. For a weekend prototype, genuinely fine. For production software, it's the thing every team that tried it learned to regret.
+
+The 2026 correction has a name & it stuck: spec-driven development (SDD). The shape is dead simple: u write a short, testable spec first (goal, constraints, non-goals, edge cases, acceptance criteria; it should read like a build contract, not like marketing copy), the agent turns the spec into a plan, the plan becomes small tasks, & the tasks become code u can actually trust. GitHub open-sourced Spec Kit for exactly this in late 2025 (the flow is constitution -> specify -> plan -> tasks -> implement), & the smart bit is that it's tool-neutral; it drives Claude Code, Copilot, Gemini CLI, Cursor, Codex, & 30-odd other agents. In a year where "which agent is best" changes every quarter, owning the spec instead of betting on one agent is the right place to stand.
+
+Here's why I'm putting this section in an article that's otherwise about Claude Code internals: SDD is the same idea as literally everything above, taken to its logical end. My whole thesis from #0 was provide the environment, don't dictate the keystrokes. The spec is the environment. As one of the analysts put it, the specification becomes the unit of governance (the artifact both ur agents & ur teammates answer to). Ur CLAUDE.md describes how the shop runs in general; the spec describes what this change has to do in particular; & SDD doesn't compete w/ TDD, it marries it: the spec says what, the tests prove it.
+
+The honest caveat, b/c I promised u skepticism & not a sales pitch:
+
+> SDD is overhead, & it isn't free. The agent re-reads the spec + plan + tasks every turn, so budget roughly 20–40% more tokens. So writing a formal spec for a five-line bug fix is the engineering equivalent of filing a ticket to brush ur teeth (pure ceremony). So I use it where the cost of getting it wrong is high (brownfield rewrites of code nobody fully understands, multi-service features, anything I'll be cursing in three months) & I skip it entirely for throwaways & quick pulls. Match the ceremony to the stakes.
+
+### 7. Dynamic Workflows & the autonomy frontier: where the puck is going
+
+Step back & look at what every section here has actually been doing. Context, skills, sub-agents, MCP, hooks, plan mode, specs (all of it is the same move: building an environment good enough that u can safely hand over bigger & bigger chunks of the work). That was the 2025 to 2026 shift I opened w/: inline assistance -> delegated engineering. The frontier is now handing over the whole chunk.
+
+Yesterday Anthropic shipped Claude Opus 4.8 & alongside it a Claude Code feature (research preview) called Dynamic Workflows. What it does is the punchline of this entire article, so far: Claude plans the work, spins up hundreds of parallel sub-agents inside a single session, verifies its own outputs, & reports back to u. Their own headline example is a codebase-scale migration across hundreds of thousands of lines (kickoff to merge) w/ ur existing test suite as the bar it has to clear.
+
+Read that last clause again, b/c it's the whole 2026 thesis compressed into one line: the test suite is the bar. This is precisely why I put "tests fast & trustworthy / CI green by default" at the very top of #0 & called it Prerequisites instead of burying it. That groundwork was never housekeeping, it's the thing that makes autonomy survivable. An agent that can verify itself against a fast, trustworthy suite can be trusted w/ a huge task. The same agent pointed at a flaky CI is just the Myth of Sisyphus at scale. The amplifier, again: the environment decides whether autonomy is a superpower or a liability generator.
+
+This is also where "agent assistants" stops being a metaphor. The same engine runs w/o u in the room, claude -p in CI, the GitHub Action reviewing PRs, the GitHub App triaging issues, Claude Code on the web. Delegated engineering gets very real the morning u wake up to find a thorough, structured code review sitting on a PR u hadn't even opened yet.
+
+> The sober note, which is the whole next section: more autonomy does not mean less responsibility. It moves ur job up the stack (from writing the code), to specifying the intent, designing the environment, & checking the outcome. Which is the actual highest-value skill of this whole era.
+
+so read on!:
+
+### 8. Trust, but verify (the skill that actually 10x's u in 2026)
+
+Time for the uncomfortable finding the hype skips. The 2025 DORA report is the one I keep citing b/c it's the most honest: yes, 90% of us now use AI & most report being more productive, but AI adoption still increased delivery instability & about 30% report little or no trust in the code the AI produces. Here's the thing: they're right to be cautious. AI produces beautifully formatted, confidently-written, subtly wrong code. The bottleneck didn't disappear when writing got cheap. It moved from writing to reviewing.
+
+So the most valuable skill in 2026 is no longer prompting. It's verification & decomposition: knowing which work is safe to delegate, where the human review gates belong, & how to tell "looks done" from "is done." DORA's own one-liner says it better than I can: AI doesn't replace code review; it makes code review more critical. Every order of magnitude u gain in generation speed, u'd better gain back in ur ability to verify, or u're just shipping liabilities faster.
+
+The good news is the tooling is meeting u halfway, & fast. Opus 4.8's actual headline isn't a benchmark bump; it's honesty. Anthropic measured it ~4× less likely than 4.7 to let a flaw in its own code go unremarked, & more likely to say "I'm not sure / the evidence is thin" instead of confidently bluffing a result. The most common failure mode of these models (jumping to "done!" when the work is actually thin) is the exact thing the latest model is being tuned to stop doing. That's the model showing up to help u verify. But "helps" is not "replaces." Ur green CI, ur sub-2-minute tests, ur small reviewable diffs from #0 (that is the harness that catches what both u & the model miss).
+
+So here's the amplifier one final time, & then I'll shut up:
+
+Every single layer in this article amplifies. Strong fundamentals + a lean, well-managed environment + real verification discipline -> u delegate w/ confidence & genuinely ship faster & better. Skip the discipline, bolt autonomy onto a flaky CI & a tightly-coupled monolith -> congratulations, u've built a machine that manufactures debt & liabilities at machine speed. The tool didn't pick which outcome u get. U did (back in #0, when u decided whether ur tests were trustworthy & ur architecture allowed isolated change). That decision is worth more in 2026 than it has ever been, b/c the amplifier got a lot louder.
+
+### Wrapping (for now)
+
+If there's one thread running from CLAUDE.md all the way to Dynamic Workflows, it's this: it was never about the tool. Every technique in here is the same instinct wearing a different hat:
+
+> Stop telling the AI how, & get obsessively good at two things: building the environment & checking the result.
+
+The engineers pulling away right now aren't the ones w/ the cleverest prompts. They're the ones who treat their AI like a fast, brilliant, slightly overconfident senior hire & who bothered to build a shop worth working in.
+
+p.s.1. That's the current state of my setup. Like any setup, it'll be half-obsolete in a quarter (Opus 4.8 landed while I was writing this, which tells u everything about the cadence), so I'll keep versioning this the way I'd version software (bumped, not re-published ;-) ).
+
+p.s.2 tell me where I'm wrong. I want the disagreements more than the agreements. If u've got a hook, a sub-agent pattern, or a spec workflow that's earning its keep in ur day-to-day, drop it & I'll fold the good ones in (w/ a shout-out, & a coffee if it's really good). 🫡
