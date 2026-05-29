@@ -48,8 +48,8 @@ export default function SeoContent() {
           <a href="https://github.com/behradkhodayar">GitHub: behradkhodayar</a>
         </li>
         <li>
-          <a href="https://www.linkedin.com/in/behradkhodayar/">
-            LinkedIn: behradkhodayar
+          <a href="https://www.linkedin.com/in/behrad-khodayar/">
+            LinkedIn: behrad-khodayar
           </a>
         </li>
         <li>

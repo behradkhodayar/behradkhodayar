@@ -98,7 +98,7 @@ behradkhodayar@github:~$ cat ~/.elsewhere
 ```
 
 - `homepage`      → [behrad.khodayar.me](https://behrad.khodayar.me/)
-- `linkedin`      → [linkedin.com/in/behradkhodayar](https://www.linkedin.com/in/behradkhodayar/)
+- `linkedin`      → [linkedin.com/in/behrad-khodayar](https://www.linkedin.com/in/behrad-khodayar/)
 - `stackoverflow` → [stackoverflow.com/users/6532189](https://stackoverflow.com/users/6532189/behrad-khodayar)
 - `medium`        → [behradkhodayar.medium.com](https://behradkhodayar.medium.com/)
 - `reddit`        → [reddit.com/user/behradkhodayar](https://www.reddit.com/user/behradkhodayar/)
