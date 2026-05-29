@@ -23,7 +23,7 @@ const PERSON_IMAGE = "/BehradKhodayar.jpeg";
 
 const SAME_AS = [
   "https://github.com/behradkhodayar",
-  "https://www.linkedin.com/in/behradkhodayar/",
+  "https://www.linkedin.com/in/behrad-khodayar/",
   "https://stackoverflow.com/users/6532189/behrad-khodayar",
   "https://behradkhodayar.medium.com/",
   "https://www.reddit.com/user/behradkhodayar/",
