@@ -37,11 +37,12 @@ behradkhodayar@github:~$ cat ~/.config/stack.toml
 # what I keep in my toolbox
 
 ["Languages & Frameworks"]
-core      = ["typescript", "javascript", "rust", "php", "sql", "bash"]
-backend   = ["node.js", "nestjs", "tokio", "axum", "sqlx", "symfony", "drupal"]
+core      = ["python", "typescript", "javascript", "rust", "php", "sql", "bash"]
+backend   = ["fastapi", "django", "node.js", "nestjs", "tokio", "axum", "sqlx", "symfony"]
 frontend  = ["next.js", "react"]
+ai        = ["langchain", "raw sdks"]
 tui       = ["ratatui"]
-testing   = ["vitest", "cargo test"]
+testing   = ["evals", "pytest", "hypothesis", "vitest", "cargo test"]
 
 ["Cloud, Infrastructure & DevOps"]
 azure     = ["iaas", "paas", "saas", "aks", "aca"]
