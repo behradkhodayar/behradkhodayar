@@ -1,0 +1,86 @@
+import PostLayout from "../components/PostLayout";
+
+export const meta = {
+  title: "The Past Three Months in AI (March–May 2026)",
+  date: "2026-05-29",
+  tags: ["Frontier Models", "Agents", "Translation"],
+};
+
+export const metadata = {
+  title: meta.title,
+  description:
+    "A post-blackout recap of three months at the AI frontier: the model wave, the architecture pivot away from raw scale, agentic coding's convergence, the MCP+A2A protocol stack, unprecedented capital, and regulators falling behind agents.",
+  alternates: {
+    canonical: "https://behrad.khodayar.me/ai/past-three-months-in-ai/",
+  },
+};
+
+export default function Layout({ children }) {
+  return <PostLayout meta={meta}>{children}</PostLayout>;
+}
+
+*Translated from my Farsi original «سه ماه گذشته در دنیای هوش مصنوعی (از اواسط اسفند تا اواسط خرداد)» — "The Past Three Months in the AI World (mid-Esfand to mid-Khordad)" — published on [LinkedIn](https://www.linkedin.com/pulse/%D8%B3%D9%87-%D9%85%D8%A7%D9%87-%DA%AF%D8%B0%D8%B4%D8%AA%D9%87-%D8%AF%D8%B1-%D8%AF%D9%86%DB%8C%D8%A7%DB%8C-%D9%87%D9%88%D8%B4-%D9%85%D8%B5%D9%86%D9%88%D8%B9%DB%8C-%D8%A7%D8%B2-%D8%A7%D9%88%D8%A7%D8%B3%D8%B7-%D8%A7%D8%B3%D9%81%D9%86%D8%AF-%D8%AA%D8%A7-%D8%AE%D8%B1%D8%AF%D8%A7%D8%AF-khodayar-hgule) on May 29, 2026, written for Iranian readers coming back online after a three-month internet blackout.*
+
+With the internet reconnected in #Iran, in this piece I'll try to briefly sum up what happened at the frontier of AI progress during these three months of disconnection. The approach here is a concise, news-style digest — not a hands-on, step-by-step guide. The main frame of the story over these three months has been this: the frontier no longer competes on raw scale; the competition has moved to architecture, AI Agents, and capital. Farvardin (late March–April) was the peak month for model releases; Ordibehesht (late April–May) was quiet in raw capability but loud in infrastructure (new architectures, agent protocols, mega infrastructure deals). If you've also been away from the internet since mid-Esfand (early March), what has actually changed is what you'll read below.
+
+Let me put an honest warning right up front: a large share of the details about model releases and benchmarks comes from trackers and aggregator blogs (llm-stats, AI Flash Report, WhatLLM, and comparison sites), not from the labs' own direct announcements — so treat the precise benchmark numbers as directional, not definitive. Fundamentally, plenty of people's experience shows benchmarks don't tell the whole story (and sometimes not even the details). The capital, compute, and regulation material, on the other hand, I've taken from more credible sources like TechCrunch, CNBC, and the European Commission, which is more citable.
+
+### 1. Models: the Farvardin wave, the Ordibehesht pause
+
+The clearest pattern we see is this: an explosion of frontier model releases in Farvardin, followed by a deliberate deep breath in Ordibehesht. Let's walk through what happened:
+
+From **OpenAI**: GPT-5.5 (with a Pro version for parallel compute), and by late Ordibehesht, GPT-5.5 Instant became ChatGPT's new default. From **Anthropic**, Claude Opus 4.7 was released, with the notable claim that its SWE-bench Verified score jumped from 80.8% to 87.6% — and per the trackers, that model led this software-engineering benchmark until very recently (before Opus 4.8 shipped); the lead now belongs to Claude Opus 4.8.
+
+**Google** was very active too: a Gemini 3.x family as the new baseline, the Gemini Omni model in late Ordibehesht, and Gemini 3.5 Flash, which they introduced themselves as "frontier-level intelligence at 4× the speed of comparable models." They're also retiring the Gemini 2.0 models (end-of-life is just a couple of days away).
+
+And a part I really want people to pay attention to: the Chinese open-weight labs that have kept pace with the frontier — DeepSeek V4, Alibaba's Qwen 3.7 Max, Moonshot's Kimi K2.6, and Zhipu's GLM-4.7. The important detail is that GLM-4.7 was trained on Huawei Ascend hardware, with a claimed 1.2% hallucination rate — and that matters because it shows the Chinese labs are routing around US chip restrictions even at the training layer, not just at inference. Another data point: Ethereum's creator (Vitalik Buterin) recently advised Europe to go toward open-source and open-weight models, because in his view that's the only option available to them if they don't want to fall behind. **And even more importantly for Iranians: working with Chinese and open-source/open-weight models is the way to keep up with the technology caravan, given the payment restrictions I mentioned. In upcoming articles we'll dig much deeper into these models — because not only are they practically the only option for Iranians inside the country, but a considerable part of the world actually prefers them over the very expensive frontier models.**
+
+A small wrap-up for this section: on the GPQA Diamond benchmark, the reported leader is GPT-5.4-Pro, but in real-world software engineering, Anthropic is ahead. That split itself is the headline: there is no longer a single frontier — there's a tight cluster whose leader depends on the kind of work.
+
+### 2. The architecture story: the least-covered but most important shift
+
+This is the thing you'd miss if you only read headlines. The interesting research signal of this season is that the industry is insuring itself against the end of pure pretraining scaling.
+
+The most interesting release didn't come from a big company — it came from a startup called SubQ, which showed up in Ordibehesht with $29M in seed funding and a single claim: their model is not a transformer at all. Their claim strikes directly at the transformers' core economic constraint — that standard transformer attention is O(n²) in context length; double the context, and the cost quadruples. That's the ceiling that makes long-context models charge real money for long calls.
+
+This sits inside a bigger overall move toward hybrid and linear-time architectures: IBM's Granite 4.0 and AI21's Jamba, for example, interleave attention layers with Mamba blocks. The driver is explicit: pure scaling is hitting diminishing returns, training runs are approaching data exhaustion by 2026, and Epoch AI forecasts scaling constraints to surface this very year — **so architectural innovation is no longer optional**.
+
+Likewise, the compute paradigm is inverting from training toward inference. Test-time compute scaling is now the dominant lever, to the point that one analysis called it "the most important architectural shift since the transformer," with a forecast that by 2030 inference compute will make up 75% of all AI compute. Let me note there's a serious antithesis to this section, which is beyond the scope (and purpose) of this piece — in the direction of combining scale with the new architectures, rather than merely replacing scale with them.
+
+### 3. Agentic development: single-turn autocomplete is dead
+
+If one claim this season has strong consensus, it's this: all the major coding tools have converged on a single pattern. Every significant coding agent now — whether Claude Code, Codex (which really took off during the period Iran was cut off), Copilot, Cursor, or Windsurf — operates on the same core pattern: agents actively explore codebases, run in long-lived loops, and coordinate in multi-agent teams. **Dear friends, the era of single-turn autocomplete is over.**
+
+The emerging mental model here is what you could call the "air-traffic controller" — one agent coordinating the rest. Cursor 3 (which landed mid-Farvardin), for example, added cloud agents on isolated VMs and parallel tabs, to the point that 30% of Cursor's own internal PRs are now authored by agents. On the other side, OpenAI's Codex passed 3 million weekly active users in Farvardin and demonstrated over 1,000 consecutive tool calls without intervention. Even the hybrid stack that heavy users describe is interesting: Claude Code for "craftsmanship," Codex CLI for "endurance," and Cursor for "parallelism" — meaning the people shipping fastest don't choose, they combine. And this narrative and recommendation is fast becoming the standard advice.
+
+Adoption among professionals has become near-universal too: JetBrains research in Farvardin showed 90% of developers were using at least one AI tool in their work by January 2026.
+
+But let me also put down two honest notes that the marketing hides. First, reliability is not the same as capability; Anthropic itself published a postmortem in Farvardin confirming Claude Code quality problems. Second, the productivity claim itself is contested; reports show "**AI has not made software delivery faster**" — which is worth sitting with, because the stakeholders are the ones making the "30–50% faster" claims. Exactly like the crypto or trading world, it matters who is making which claim: in crypto and trading, there were plenty of scammers who emptied a nation's pockets with dream-selling to unload their own bags. My standing suggestion is to keep that blockchain-world maxim — "Don't Trust, Verify" — pinned to our ears at all times.
+
+### 4. The protocol layer and interoperability hardened
+
+The agent ecosystem has standardized around a two-layer architecture, and this matters because it's playing the role of the TCP/IP-equivalent infrastructure. In plain terms: the MCP protocol is for agent-to-tool communication (vertical), and the A2A protocol is for agent-to-agent communication (horizontal).
+
+The key structural change isn't the new protocol itself but the governance: both were donated to the Linux Foundation's Agentic AI Foundation (AAIF), and OpenAI, Google, Microsoft, and dozens of organizations have adopted them. One thing that happened in early Farvardin: OpenAI released an official extension that runs inside Claude — meaning competitors are now interoperating at the tool layer.
+
+### 5. Capital and compute: the defining business story
+
+The numbers in this section are both the most consequential and the best-sourced. The frontier labs are raising or allocating capital at a scale that genuinely has no precedent. **OpenAI** announced $122 billion in new funding in mid-Farvardin, at an $852 billion valuation. **Anthropic** reached one trillion dollars — the same company that was valued at $350 billion as recently as February; that's roughly 2.5× in about three months. I bring these numbers up purely as a reliable signal that this trend continues — that the world keeps moving in this direction, and domestic experts and specialists really need to get moving and not be left behind, because this trend doesn't look reversible (at least to me, personally). Whether this is rational infrastructure build-out or a bubble remains an open question, and interestingly, even the optimistic reports keep hedging with the word "bubble."
+
+The landmark event was the Google–Anthropic deal: Google invests up to $40 billion in Anthropic, including 5 gigawatts of new Google Cloud capacity over five years. One truly astonishing data point, if accurate, is Anthropic's revenue jump: a roughly $30 billion annual run-rate in early 2026, up from roughly $9 billion at the end of 2025. That $30B figure mostly traces back to secondary media aggregation, though, so I personally file it as plausible-but-unconfirmed.
+
+The structural read is that compute has become both the binding constraint and a strategic weapon. The hyperscalers are doing strange things — Google, for instance, simultaneously funds Anthropic and competes with it through Gemini! Not that strange, really — if you've spent time in finance, they're simulating something of a Berkshire Hathaway of technology.
+
+### 6. Regulation and safety: agents broke the existing frameworks
+
+The regulatory theme of this season is that agentic AI outran the rules written for static models. In the EU, the high-risk obligations of the EU AI Act are set to take effect from around mid-Mordad this year (August 2026) — though a proposed delay might push it to 2027 — with fines up to €15 million or 3% of global turnover.
+
+The agent-governance gap is real, and they're saying it out loud now. Two incidents have become the canonical examples: in December 2025, Amazon's Kiro coding agent deleted a live production environment, producing a 13-hour regional AWS outage; and — you probably remember this from before the blackouts — an autonomous agent "went off the rails" after a software contribution of its was rejected, and wrote and published a scathing post against the volunteer maintainer who rejected it. The US still has no comprehensive federal law, and agencies are working off their existing authorities.
+
+One purchasing-behavior shift is worth noting too: in regulated sectors (finance, healthcare, legal), accuracy and auditability are starting to outrank raw capability — one example being a bank that selected its model based on hallucination resistance, not benchmark scores.
+
+### The one-paragraph wrap-up
+
+If I had to compress it all into one paragraph: Farvardin was a wave of frontier models, though with no single winner; Ordibehesht pivoted to architecture, where subquadratic and non-transformer models went commercial and the industry openly tried to insure itself against pretraining's diminishing returns. Agentic coding consolidated around the multi-agent "coordinator" pattern, the MCP+A2A protocol stack went under Linux Foundation governance, and capital poured in on top of capital. Meanwhile, the first serious agent-failure incidents showed that regulation written for static models still can't handle autonomous, interoperating agents.
+
+I hope this piece has been useful — and I hope Iran's technology ecosystem blossoms again.

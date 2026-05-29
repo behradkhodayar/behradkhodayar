@@ -23,6 +23,14 @@ export const posts: Post[] = [
     tags: ["Classifiers", "Harnesses", "AI Safety"],
   },
   {
+    slug: "past-three-months-in-ai",
+    title: "The Past Three Months in AI (March–May 2026)",
+    date: "2026-05-29",
+    excerpt:
+      "A post-blackout recap of the AI frontier: the model wave, the architecture pivot away from raw scale, agentic coding's convergence, the MCP+A2A protocol stack & unprecedented capital — translated from my Farsi original.",
+    tags: ["Frontier Models", "Agents", "Translation"],
+  },
+  {
     slug: "how-i-actually-use-ai-every-day",
     title: "How I Actually Use AI Every Day as a Software Engineer",
     date: "2026-05-10",
