@@ -1,0 +1,82 @@
+import PostLayout from "../../ai/components/PostLayout";
+
+export const meta = {
+  title: "Introducing CheXX: chess w/ transmuting pieces",
+  date: "2026-06-17",
+  tags: ["Chexx", "Game Design", "Three.js"],
+};
+
+export const metadata = {
+  title: meta.title,
+  description:
+    "Why & how I built CheXX — a chess variant where Major/Minor pieces transmute on landing, value-capped to keep both armies balanced, shipped as a 3D browser game.",
+  alternates: {
+    canonical: "https://behrad.khodayar.me/chess/introducing-chexx/",
+  },
+};
+
+export default function Layout({ children }) {
+  return (
+    <PostLayout meta={meta} backHref="/chess" backLabel="Chess">
+      {children}
+    </PostLayout>
+  );
+}
+
+*Originally published on [LinkedIn](https://www.linkedin.com/pulse/introducing-chexx-chess-w-transmuting-pieces-behrad-khodayar-hyeve) (June 17, 2026). Play it at [chexx-game.netlify.app](https://chexx-game.netlify.app/); source on [GitHub](https://github.com/behradkhodayar/chexx).*
+
+A while back (almost 2 yrs ago), I came up w/ an idea to make chess game more playful & fun for a broader population.
+
+### Why?
+
+For most of the people, the problem w/ chess, is that it has no chance element in it, which they translate it to not being fun enough. By this, I mean, if two players play against each other for (say) 10000 times, the "better" player, will certainly win more matches (+5001). This is what most people don't like about chess. Actually for a lot of people, that's one of chess's biggest barriers. There's little room for surprises. If one player is significantly stronger than the other, the outcome is often predictable.
+
+In Chexx, w/ it's initial version being released only digitally, there's a randomness element baked into the game (thus the **xx** replacing **ss**, making it **CHEXX**). The goal is to make the game more enjoyable for that group of players while preserving much of what makes chess interesting in the first place.
+
+### What?
+
+Chexx is Chess w/ one major different:
+
+Once u move a Major (Queen/Rook) or Minor (Knight/Bishop) piece, the moment it lands on the target square, its type changes (**Transmuted**); for example Knight becomes Queen, so u've got 2 queens.
+
+The transmuted piece is then treated according to its new type. If it's now a Queen & can check the opponent's King via a diagonal route, the check is legit. However, it no longer threatens pieces using its pre-transmutation L-shaped Knight movement.
+
+There could/will be lots of variations to Chexx, but in the base version of it, **the new type is chosen randomly**. However, the randomization is constrained by the game's value-cap rule. The engine first determines all legal piece types that would keep the side under its configured value cap, then randomly selects one of those outcomes.
+
+For example, if turning a piece into a Queen would cause the side's total value to exceed the cap, Queen is simply excluded from the candidate set for that transmutation event.
+
+The base sub-variant of CheXX is value-capped & each game can be identified by its cap as a tag.
+
+**Example:** CheXX-VC-54
+
+This means the total value of each side's pieces cannot exceed 54. Whenever a piece transmutes, the game computes all legal resulting piece types & randomly chooses among them. (Any outcome that would cause the side's total piece value to exceed the cap is excluded.)
+
+For example, u can't have all seven of your Major/Minor pieces become Queens:
+
+7 × 9 + 8 × 1 = 71 > 54
+
+...therefore not allowed.
+
+There could be additional sub-variants as well. For example:
+
+- Minors can only transmute into other Minors.
+- Majors can only transmute into other Majors.
+- Players can choose the transmutation outcome instead of relying on randomness.
+
+The physical version of the game requires a dice & at least two sets of chess pieces, so u can bring in on board 3 Knights if necessary. For now, we're only exploring the digital version.
+
+### How?
+
+I've always wanted to develop an initial version of Chexx to bring it to life & play it against family & friends, since 2 yrs ago. Unfortunately I've been too busy to dedicate the required time & lock in to build & release it. Especially b/c as I just mentioned it's supposed to be targeted at a group of people that are not by default chess-lovers; so IMO it should have been shipped w/ commonly desired aesthetics of games; i.e. at least a 3D version.
+
+The rule engine; which is just a variant of the default chess engine + a randomize feature, has never been the barrier. I'm also well versed in Three.js lib & ecosystem (RTF, ...) & the open elements has always been abundant. But, the permanent excuse of not having enough spare time, existed & persisted for past 2 years.
+
+W/ LLMs becoming mature & growth of tooling around things changed for better. Code has become commodity. I as a SWE (Me as a SWE?! debate time!;-) ) have got more free time, both to build & **more importantly maintain a project if the community finds it interesting**.
+
+Days ago, ayk, Anthropic release Fable & I thought it's the right time to embark on implementing Chexx; but it was suspended 3 days later. Tho, the urge to build in me didn't disappear this time. So I remained determined to build it.
+
+TIL that a well designed Three.js game director skill for Claude is released. So jumped right into implementing a one-shot version of it today.
+
+### Wdyt?
+
+Go give it a play & tell me how u feel about it. what other features u like the most to be added/changed to/in the game, from naming (Chexx?) to gameplay & features. As I told earlier, I'm available to maintain this for foreseeable future.
