@@ -1,0 +1,55 @@
+import PostLayout from "../../ai/components/PostLayout";
+
+export const meta = {
+  title: "How would engines handle a chess variant where pieces transform after move?",
+  date: "2026-06-18",
+  tags: ["Chexx", "Chess Engines", "Game Design"],
+};
+
+export const metadata = {
+  title: meta.title,
+  description:
+    "The engine-design questions behind Chexx — a chess variant where every Major/minor move transmutes the piece: volatile material evaluation, unreliable piece-square tables, and alpha-beta vs MCTS.",
+  alternates: {
+    canonical: "https://behrad.khodayar.me/chess/chexx-engines-transforming-pieces/",
+  },
+};
+
+export default function Layout({ children }) {
+  return (
+    <PostLayout meta={meta} backHref="/chess" backLabel="Chess">
+      {children}
+    </PostLayout>
+  );
+}
+
+*Originally posted on [r/ComputerChess](https://www.reddit.com/r/ComputerChess/comments/1u9i8o4/how_would_engines_handle_a_chess_variant_where/) (June 18, 2026), while building [Chexx](https://chexx-game.netlify.app/) — chess where every move transmutes your pieces.*
+
+I'm experimenting with a chess variant & wanted some engine-oriented perspectives.
+
+**Core rule:**
+
+Whenever a Major/minor piece moves, it transforms into another piece type (randomly selected among legal value-capped outcomes: e.g. Chexx-VC-54 ~ total value of each side < 54).
+
+That means:
+
+- material evaluation becomes less static
+- move consequences can alter future mobility in unusual ways
+- piece-square tables become less reliable
+- Bakes a chance element into the game making it more fun & unpredictable
+
+I'm wondering how engines would adapt.
+
+**Some thoughts:**
+
+- Would alpha-beta suffer more because tactical trees become harder to prune?
+- Would MCTS perform better in this environment?
+- How much harder would evaluation design become compared to standard chess?
+
+It feels like the branching factor isn't necessarily larger, but the state volatility is.
+
+Curious whether anyone here has worked on similar transformation-based variants.
+
+---
+
+> **Where this went:** the variant shipped as **[Chexx](https://chexx-game.netlify.app/)** — a 3D browser chess game built with Three.js + TypeScript, w/ vs-Computer (Novice / Skilled / Master) & 2-player hotseat modes. Source on [GitHub](https://github.com/behradkhodayar/chexx).
