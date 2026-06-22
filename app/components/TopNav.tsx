@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { projects } from "../ai/content";
 
 type Link = {
   name: string;
@@ -61,6 +63,7 @@ const LINKS: Link[] = [
 
 export default function TopNav() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!open) return;
@@ -68,6 +71,12 @@ export default function TopNav() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
+
+  // Projects are full-bleed: they carry their own header + back-link, so the
+  // global nav is suppressed on their routes.
+  const path = pathname?.replace(/\/$/, "") ?? "";
+  const onProjectRoute = projects.some((p) => path === `/ai/${p.slug}`);
+  if (onProjectRoute) return null;
 
   return (
     <nav

@@ -41,8 +41,8 @@
   --mono: var(--font-jbmono), "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --sans: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
 
-  /* height of the site's fixed TopNav, so our content + sticky header clear it */
-  --site-nav-h: 3.25rem;
+  /* the global TopNav is hidden on project routes, so this is full-bleed */
+  --site-nav-h: 0rem;
 
   position: relative;
   isolation: isolate;
