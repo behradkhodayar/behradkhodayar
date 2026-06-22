@@ -75,12 +75,20 @@ export default function TopNav() {
       className="fixed top-0 inset-x-0 z-50 backdrop-blur-sm bg-[var(--background)]/30"
     >
       <div className="flex items-center justify-between px-4 py-3 md:py-4 max-w-6xl mx-auto">
-        <Link
-          href="/"
-          className="font-mono text-sm md:text-base tracking-tight text-[var(--foreground)] hover:opacity-80"
-        >
-          behrad.khodayar.me
-        </Link>
+        <div className="flex items-center gap-5">
+          <Link
+            href="/"
+            className="font-mono text-sm md:text-base tracking-tight text-[var(--foreground)] hover:opacity-80"
+          >
+            behrad.khodayar.me
+          </Link>
+          <Link
+            href="/ai"
+            className="font-mono text-sm tracking-tight text-[var(--foreground)] opacity-75 hover:opacity-100 transition-opacity"
+          >
+            AI
+          </Link>
+        </div>
 
         <ul className="hidden md:flex items-center gap-5">
           {LINKS.map((link) => (
