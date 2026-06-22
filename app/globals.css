@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
   --background: #ffffff;
@@ -28,4 +29,32 @@ body {
 
 #scene-container{
       height:100vh;
+}
+
+/* rehype-pretty-code: let the shiki theme own code-block colors inside prose */
+.prose figure[data-rehype-pretty-code-figure] pre {
+  background: #22272e; /* matches github-dark-dimmed */
+  color: inherit;
+  overflow-x: auto;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.prose figure[data-rehype-pretty-code-figure] code {
+  display: grid; /* one row per line, enables line highlighting */
+  background: transparent;
+  padding: 0;
+  font-weight: inherit;
+}
+.prose [data-rehype-pretty-code-figure] code[data-line-numbers] {
+  counter-reset: line;
+}
+.prose [data-rehype-pretty-code-figure] code [data-line] {
+  padding: 0 0.25rem;
+}
+/* drop prose's backtick quotes around inline code */
+.prose :where(code):not(:where(pre code))::before,
+.prose :where(code):not(:where(pre code))::after {
+  content: none;
 }
