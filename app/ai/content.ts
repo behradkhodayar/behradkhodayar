@@ -30,8 +30,13 @@ export const posts: Post[] = [
 ];
 
 export const projects: Project[] = [
-  // The agentic-coding-stack-aio project route lands in a follow-up PR; its
-  // entry is added here at the same time so the listing never points at a 404.
+  {
+    slug: "agentic-coding-stack-aio",
+    title: "Agentic Coding Stack — All-in-One",
+    description:
+      "An interactive ontology of the agentic coding stack: nine layers, the request lifecycle, cross-cutting concerns, and build-time provenance — explorable across four axes.",
+    tags: ["Taxonomy", "Agents", "Interactive"],
+  },
 ];
 
 /** Newest-first posts for listing. */
