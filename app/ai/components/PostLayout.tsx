@@ -19,18 +19,22 @@ function formatDate(iso: string) {
 // `prose` wrapper (@tailwindcss/typography).
 export default function PostLayout({
   meta,
+  backHref = "/ai",
+  backLabel = "AI",
   children,
 }: {
   meta: PostMeta;
+  backHref?: string;
+  backLabel?: string;
   children: React.ReactNode;
 }) {
   return (
     <main className="mx-auto max-w-2xl px-5 pb-24 pt-24 md:pt-28">
       <Link
-        href="/ai"
+        href={backHref}
         className="font-mono text-sm opacity-60 transition-opacity hover:opacity-100"
       >
-        ← AI
+        ← {backLabel}
       </Link>
 
       <header className="mb-10 mt-6">

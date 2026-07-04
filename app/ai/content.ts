@@ -2,14 +2,9 @@
 // Each entry's `slug` is also the route-folder name under app/ai/<slug>/.
 // Keep this in sync when adding a post (page.mdx) or project (page.tsx).
 
-export type Post = {
-  slug: string;
-  title: string;
-  /** ISO date (YYYY-MM-DD) */
-  date: string;
-  excerpt: string;
-  tags: string[];
-};
+import { type Post, byDateDesc } from "../lib/content";
+
+export type { Post };
 
 export type Project = {
   slug: string;
@@ -40,6 +35,4 @@ export const projects: Project[] = [
 ];
 
 /** Newest-first posts for listing. */
-export const postsByDate = [...posts].sort((a, b) =>
-  a.date < b.date ? 1 : a.date > b.date ? -1 : 0,
-);
+export const postsByDate = byDateDesc(posts);
