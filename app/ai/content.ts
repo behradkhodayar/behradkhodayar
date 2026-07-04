@@ -18,16 +18,7 @@ export type Project = {
   tags: string[];
 };
 
-export const posts: Post[] = [
-  {
-    slug: "why-mcp-matters",
-    title: "Why MCP Matters",
-    date: "2026-06-22",
-    excerpt:
-      "A field note on the Model Context Protocol — what it standardizes, why it changes how agents reach the world, and where it still bites.",
-    tags: ["MCP", "Agents", "LLMs"],
-  },
-];
+export const posts: Post[] = [];
 
 export const projects: Project[] = [
   {
