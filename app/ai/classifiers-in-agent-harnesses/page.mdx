@@ -1,0 +1,201 @@
+import PostLayout from "../components/PostLayout";
+
+export const meta = {
+  title: "Classifiers in Harnesses",
+  date: "2026-07-04",
+  tags: ["Classifiers", "Harnesses", "AI Safety"],
+};
+
+export const metadata = {
+  title: meta.title,
+  description:
+    "A field guide to the classifiers wrapped around modern LLMs: security & jailbreak classifiers, prompt-injection probes, tool-risk & auth gates & the probabilistic classifier in front of Anthropic's Fable model.",
+  alternates: {
+    canonical: "https://behrad.khodayar.me/ai/classifiers-in-agent-harnesses/",
+  },
+};
+
+export default function Layout({ children }) {
+  return <PostLayout meta={meta}>{children}</PostLayout>;
+}
+
+Anthropic putting a "probabilistic classifier" in front of Fable, has introduced
+yet another interesting topic for the curious mind to explore. But, classifiers rn't
+a fully novel idea in the field. They've been around for agents & harnesses.
+So, what r classifiers in agent harnesses?
+
+Every serious agent harness has quietly grown a 2nd nervous system. The model does
+the work; a swarm of smaller, faster models sits around it deciding what the big one
+is allowed to c, say & execute. These r **classifiers** which r narrow judgment
+machines wrapped around a general one & in 2026 they've become the load-bearing
+security layer of the agentic stack.
+
+This post is actually a side artifact of my recent efforts to build a custom coding
+harness (a pet project, ofc). I’m gonna share my findings, since I feel pretty confident
+about them now.
+
+
+## Why classifiers at all?
+
+The deterministic tools v already had (allowlists, permission prompts, policy
+engines) don't survive contact w/ agents. Anthropic's data on Claude Code is
+blunt about it: users approve **93%** of permission prompts. **At that rate a prompt
+isn't a control, it's a click**. So a static allowlist can't tell `git push` on ur
+feature branch from `git push --force` over someone's history.
+
+> Why a *classifier* & not another rule? b/c the dangerous part of an agent's
+> action is usually **semantic, not syntactic**. "Does this command discard work the
+> user never agreed to lose?" is a judgment call & judgment calls r what models
+> r for.
+
+So harness builders reached for the same hammer they already owned: put a model in
+front of the model :-). (I keep seeing this pattern a lot. A LOT. I mean it)
+
+## A working taxonomy
+
+"Classifier" gets used loosely, so let's pin down the families u'll actually meet
+in a harness, from the outermost layer inward:
+
+| Family | Question it answers | Real examples |
+| ------ | ------------------- | ------------- |
+| **Security / jailbreak classifiers** | Is this exchange trying to extract harm? | Anthropic's Constitutional Classifiers, Llama Guard |
+| **Prompt-injection classifiers** | Is this *input* trying to hijack the agent? | Llama Prompt Guard 2, Azure Prompt Shields, Claude Code's injection probe |
+| **Tool-risk classifiers** | Is this *action* dangerous? | Claude Code auto mode's two-stage classifier |
+| **Authorization / intent classifiers** | Did the user actually ask for this? | The intent-alignment rules inside that same pipeline |
+| **Model-level probabilistic classifiers** | Should the frontier model answer at all? | **The classifier gate in front of Claude Fable 5** |
+
+The families blur at the edges (1 deployed system often does 2/3 jobs)
+but the questions stay distinct & that's what matters when u design one.
+
+## Security classifiers: the constitutional turn
+
+The canonical input/output screen is Anthropic's **Constitutional Classifiers**:
+classifiers trained on synthetic data generated from a natural-language
+"constitution" of what's allowed. The first generation cut jailbreak success from
+**86% to 4.4%**, at a real price (Huge. isn't it?)(w/ roughly **23.7%** compute
+overhead & a 0.38% bump in refusals of harmless queries).
+
+The second generation (**Constitutional Classifiers++**) is the
+interesting one architecturally imo. Instead of only reading text, a lightweight
+first-stage probe reads the model's **internal activations** (gut reaction to
+the exchange) & escalates suspicious traffic to a heavier classifier that sees
+input & output together. Overhead dropped to ~1%, harmless-refusal rate to 0.05%,
+& across ~1,700 hours & 198,000 red-team attempts, nobody found a universal
+jailbreak.
+
+That's the pattern to internalize: **cheap probe on everything, expensive judgment
+on the flagged few**. It shows up again below.
+
+## Prompt-injection classifiers: guarding the inputs
+
+Agents read hostile text all day from web pages to issue comments & tool outputs. Injection
+classifiers screen that inbound content for "ignore ur previous instructions"
+energy. Meta ships **Llama Prompt Guard 2** as dedicated 86M/22M-param
+classifiers small enough to run on every tool result; Azure sells the same shape as
+**Prompt Shields**; Claude Code runs a server-side probe over file reads, web
+fetches & shell output & when it flags sth it doesn't block (it injects
+a warning that re-anchors the agent to what the *user* asked for).
+
+Be sober about this layer: a 2026 evaluation showed 6 commercial injection
+detectors could be evaded at up to **100%** success w/ character-level tricks &
+adversarial rephrasing. Injection classifiers r a tripwire, not a wall (which is
+exactly why the more interesting defenses moved to the action layer).
+
+## Tool-risk & auth classifiers: the action layer
+
+This is the layer I find most instructive, b/c Anthropic published the whole
+design for Claude Code's **auto mode**. The harness classifies every non-trivial
+action the agent wants to take, w/ a 2-stage pipeline straight out of the
+constitutional playbook:
+
+- **Stage 1** — a fast yes/no pass over every action, tuned to over-block.
+  Alone it false-positives on 8.5% of real traffic.
+- **Stage 2** — chain-of-thought review, run *only* on what stage 1 flagged.
+  e2e false positives drop to **0.4%**; prompt caching makes the 2nd
+  pass nearly free.
+
+A couple of design choices r worth stealing:
+
+- 1st: The classifier is **reasoning-blind
+by design**: it sees the user's messages & the raw tool call (never the agent's
+prose, never tool outputs). The agent cannot talk its way past the gate & a
+prompt-injected file never even reaches the judge; the malicious `curl` it induced
+does.
+- 2nd: Denial is **deny&continue**: a blocked action returns to the agent
+as a tool result saying "find a safer way," so a false positive costs one retry, not
+a dead session.
+
+The *auth* question lives in
+the same pipeline as explicit intent rules. "Clean up my branches" does not
+authorize batch-deleting remote branches; "can v fix it?" is a question, not a
+directive. Anthropic's honest number here: **17%** of genuinely overeager actions
+still slip through, mostly cases where the classifier saw the danger but misjudged
+whether the user's consent covered the blast radius. Classifier-as-authorizer is a
+real control & a leaky one, at the same time.
+
+### What about MCP's risk hints?
+
+Adjacent to classified risk sits *declared* risk: MCP tool annotations (
+`readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`) give harnesses
+a vocab for risk-tiering tool calls w/o inference. A read-only tool from a
+trusted server can skip classification entirely; a destructive one earns a
+confirmation step. But the spec itself says the quiet part loudly: annotations r
+**hints, not contracts**. **Any server can claim `readOnlyHint: true` & then delete
+ur data**. Declared risk tells u what a tool *claims* to be; classifiers exist for
+what it might actually do; deterministic sandboxes for what it *can* do. U want
+all 3.
+
+## The Fable case: a classifier in front of a frontier model
+
+The newest member of the family is the most consequential: Anthropic shipped
+**Claude Fable 5** w/ a probabilistic classifier gate
+in front of it. Separate systems screen requests for offensive-cyber work, dual-use
+biology & chemistry & distillation attempts & when they fire, the request
+doesn't just die: it **falls back to Claude Opus 4.8**.
+Same model weights minus the gate r sold separately, as Claude Mythos 5,
+to vetted organizations only. **(NO ONE LIKES THIS, but beyond the scope of this piece)**.
+
+The published numbers: safeguards trigger in **under 5% of sessions** & a
+1,000+-hour bug bounty found no universal jailbreak. The false positives land
+exactly where u'd predict (benign security tooling & life-sciences work
+adjacent to the screened domains).
+
+For those of us building on the API, this changes the contract in a way worth
+noticing: **a classifier decline is a **successful response**. HTTP 200,
+`stop_reason: "refusal"`**, a `stop_details.category` telling u which screen fired,
+an empty (& unbilled) `content` array (& an opt-in `fallbacks` param that
+reruns the request on Opus 4.8 inside the same call). Refusal used to be a vibe in
+the model's text; now it's a typed field u're expected to branch on. That's the
+clearest signal yet that classifiers rn't an implementation detail of the lab, but
+r part of the product surface.
+
+## What I'd take away as a builder
+
+1. **Layer probabilistic on deterministic, never instead of it.** Allowlists,
+   sandboxes & hooks fire every time; classifiers catch the semantic gap the
+   rules can't express.
+2. **Cascade for cost.** Cheap screen on everything, expensive reasoning on the
+   flagged few (the 8.5% to 0.4% & 23.7% to 1% numbers both come from the same
+   trick).
+3. **Keep the judge blind to persuasion.** Classify the user's words & the raw
+   action. The moment the agent's own reasoning becomes evidence, the gate is
+   negotiable.
+4. **Design for the false positive.** Deny&continue & model fallbacks turn a
+   wrong block into a retry instead of an outage. A classifier u can't afford to
+   have wrong is a classifier u'll be pressured to turn off.
+5. **Trust declarations from no one.** `readOnlyHint` is marketing until a
+   classifier (or better, a sandbox) agrees.
+
+The harness used to be plumbing around the model. Increasingly it's a small
+judiciary: probes, screens & gates, each ruling on a narrow question thousands of
+times a day. Knowing which judge does what is becoming part of the job.
+
+---
+
+**Sources & further reading:**
+[Constitutional Classifiers](https://www.anthropic.com/research/constitutional-classifiers) ·
+[Next-gen Constitutional Classifiers](https://www.anthropic.com/research/next-generation-constitutional-classifiers) ·
+[How Anthropic built Claude Code auto mode](https://www.anthropic.com/engineering/claude-code-auto-mode) ·
+[Claude Fable 5 & Mythos 5 announcement](https://www.anthropic.com/news/claude-fable-5-mythos-5) ·
+[Llama Prompt Guard 2](https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M) ·
+[MCP tool annotations as risk vocabulary](https://blog.modelcontextprotocol.io/posts/2026-03-16-tool-annotations/)

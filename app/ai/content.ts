@@ -18,7 +18,16 @@ export type Project = {
   tags: string[];
 };
 
-export const posts: Post[] = [];
+export const posts: Post[] = [
+  {
+    slug: "classifiers-in-agent-harnesses",
+    title: "Classifiers in Harnesses",
+    date: "2026-07-04",
+    excerpt:
+      "A field guide to the classifiers wrapped around modern LLMs — security & jailbreak screens, prompt-injection probes, tool-risk & authorization gates, and the probabilistic classifier in front of Anthropic's Fable model.",
+    tags: ["Classifiers", "Harnesses", "AI Safety"],
+  },
+];
 
 export const projects: Project[] = [
   {
