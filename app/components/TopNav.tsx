@@ -13,6 +13,14 @@ type Link = {
 
 const iconClass = "w-5 h-5 fill-current";
 
+// Writing sections shown as text links next to the site name.
+const SECTIONS = [
+  { name: "AI", href: "/ai" },
+  { name: "Blockchain", href: "/blockchain" },
+  { name: "Chess", href: "/chess" },
+  { name: "Dev Tools", href: "/dev-tools" },
+];
+
 const LINKS: Link[] = [
   {
     name: "GitHub",
@@ -91,12 +99,15 @@ export default function TopNav() {
           >
             behrad.khodayar.me
           </Link>
-          <Link
-            href="/ai"
-            className="font-mono text-sm tracking-tight text-[var(--foreground)] opacity-75 hover:opacity-100 transition-opacity"
-          >
-            AI
-          </Link>
+          {SECTIONS.map((section) => (
+            <Link
+              key={section.href}
+              href={section.href}
+              className="font-mono text-sm tracking-tight text-[var(--foreground)] opacity-75 hover:opacity-100 transition-opacity"
+            >
+              {section.name}
+            </Link>
+          ))}
         </div>
 
         <ul className="hidden md:flex items-center gap-5">
