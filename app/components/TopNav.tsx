@@ -89,7 +89,9 @@ export default function TopNav() {
   return (
     <nav
       aria-label="Primary"
-      className="fixed top-0 inset-x-0 z-50 backdrop-blur-sm bg-[var(--background)]/30"
+      className={`fixed top-0 inset-x-0 z-50 backdrop-blur-sm ${
+        open ? "bg-[var(--background)]/95" : "bg-[var(--background)]/30"
+      }`}
     >
       <div className="flex items-center justify-between px-4 py-3 md:py-4 max-w-6xl mx-auto">
         <div className="flex items-center gap-5">
@@ -103,7 +105,7 @@ export default function TopNav() {
             <Link
               key={section.href}
               href={section.href}
-              className="font-mono text-sm tracking-tight text-[var(--foreground)] opacity-75 hover:opacity-100 transition-opacity"
+              className="hidden md:inline font-mono text-sm tracking-tight text-[var(--foreground)] opacity-75 hover:opacity-100 transition-opacity"
             >
               {section.name}
             </Link>
@@ -146,26 +148,41 @@ export default function TopNav() {
       </div>
 
       {open && (
-        <ul
+        <div
           id="mobile-menu"
-          className="md:hidden flex items-center justify-center gap-6 px-4 pb-4 pt-1 border-t border-[var(--foreground)]/10"
+          className="md:hidden px-4 pb-4 pt-1 border-t border-[var(--foreground)]/10"
         >
-          {LINKS.map((link) => (
-            <li key={link.name}>
-              <a
-                href={link.href}
-                target="_blank"
-                rel="me noopener noreferrer"
-                aria-label={link.name}
-                title={link.name}
-                onClick={() => setOpen(false)}
-                className="block p-2 text-[var(--foreground)] opacity-80 hover:opacity-100"
-              >
-                {link.icon}
-              </a>
-            </li>
-          ))}
-        </ul>
+          <ul className="flex flex-col">
+            {SECTIONS.map((section) => (
+              <li key={section.href}>
+                <Link
+                  href={section.href}
+                  onClick={() => setOpen(false)}
+                  className="block py-2.5 font-mono text-sm tracking-tight text-[var(--foreground)] opacity-75 hover:opacity-100 transition-opacity"
+                >
+                  {section.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <ul className="mt-1 flex items-center gap-4 border-t border-[var(--foreground)]/10 pt-3">
+            {LINKS.map((link) => (
+              <li key={link.name}>
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="me noopener noreferrer"
+                  aria-label={link.name}
+                  title={link.name}
+                  onClick={() => setOpen(false)}
+                  className="block p-2 text-[var(--foreground)] opacity-80 hover:opacity-100"
+                >
+                  {link.icon}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </nav>
   );
