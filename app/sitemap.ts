@@ -9,15 +9,18 @@ export const dynamic = "force-static";
 
 const SITE_URL = "https://behrad.khodayar.me";
 
-function sectionEntries(
-  basePath: string,
-  posts: Post[],
-  now: Date,
-): MetadataRoute.Sitemap {
+/** Publish date of the newest post — the last time the listing actually changed. */
+function newestDate(posts: Post[]): Date {
+  return new Date(
+    posts.reduce((max, post) => (post.date > max ? post.date : max), posts[0].date),
+  );
+}
+
+function sectionEntries(basePath: string, posts: Post[]): MetadataRoute.Sitemap {
   return [
     {
       url: `${SITE_URL}${basePath}/`,
-      lastModified: now,
+      lastModified: newestDate(posts),
       changeFrequency: "weekly",
       priority: 0.8,
     },
@@ -31,24 +34,25 @@ function sectionEntries(
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
+  const sections = [aiPosts, blockchainPosts, chessPosts, devToolsPosts];
 
   return [
     {
       url: SITE_URL,
-      lastModified: now,
+      lastModified: newestDate(sections.flat()),
       changeFrequency: "monthly",
       priority: 1,
     },
-    ...sectionEntries("/ai", aiPosts, now),
+    ...sectionEntries("/ai", aiPosts),
+    // Projects carry no publish date, so their entries omit lastModified
+    // rather than report a value that changes on every build.
     ...projects.map((project) => ({
       url: `${SITE_URL}/ai/${project.slug}/`,
-      lastModified: now,
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),
-    ...sectionEntries("/blockchain", blockchainPosts, now),
-    ...sectionEntries("/chess", chessPosts, now),
-    ...sectionEntries("/dev-tools", devToolsPosts, now),
+    ...sectionEntries("/blockchain", blockchainPosts),
+    ...sectionEntries("/chess", chessPosts),
+    ...sectionEntries("/dev-tools", devToolsPosts),
   ];
 }
