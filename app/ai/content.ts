@@ -15,6 +15,14 @@ export type Project = {
 
 export const posts: Post[] = [
   {
+    slug: "introducing-claude-code-py-ts-pg",
+    title: "Introducing claude-code-py-ts-pg: a full-stack template w/ Claude built in",
+    date: "2026-07-06",
+    excerpt:
+      "Why & what of my new GitHub template (Python/FastAPI + TypeScript/React + Postgres) w/ a committed Claude Code harness: rules, skills, subagents & least-privilege permissions, treated as production infrastructure.",
+    tags: ["Claude Code", "Template", "Full-Stack"],
+  },
+  {
     slug: "classifiers-in-agent-harnesses",
     title: "Classifiers in Harnesses",
     date: "2026-07-04",
