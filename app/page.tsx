@@ -1,51 +1,47 @@
-"use client"
+import { type FeedEntry } from "./lib/content";
+import { posts as aiPosts, projects } from "./ai/content";
+import { posts as blockchainPosts } from "./blockchain/content";
+import { posts as chessPosts } from "./chess/content";
+import { posts as devToolsPosts } from "./dev-tools/content";
+import PhosphorHome from "./components/PhosphorHome";
 
-import { CameraControls } from "@react-three/drei";
-    import { Canvas, useThree } from '@react-three/fiber'
-    import {Center, Text3D, OrbitControls } from '@react-three/drei'
+// The homepage feed: every post and project across sections, newest first.
+// Sections keep their own listings; this page is the merged chronology.
+function buildFeed(): FeedEntry[] {
+  const postEntries = (
+    [
+      ["ai", aiPosts],
+      ["blockchain", blockchainPosts],
+      ["chess", chessPosts],
+      ["dev-tools", devToolsPosts],
+    ] as const
+  ).flatMap(([section, posts]) =>
+    posts.map((post) => ({
+      href: `/${section}/${post.slug}`,
+      title: post.title,
+      date: post.date,
+      section,
+      kind: "post" as const,
+      excerpt: post.excerpt,
+      tags: post.tags,
+    })),
+  );
 
-export default function Home() {
-  return (
-    <div id="scene-container">
-    <Canvas orthographic camera={{ position: [0, 0, 100], zoom: 100 }}>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[10, 10, 10]} />
-      <ResponsiveScale>
-        <Scene />
-      </ResponsiveScale>
-      <OrbitControls enableZoom={false} enablePan={false} minPolarAngle={Math.PI / 2} maxPolarAngle={Math.PI / 2} />
-      <CameraControls />
-    </Canvas>
-    </div>
+  const projectEntries = projects.map((project) => ({
+    href: `/ai/${project.slug}`,
+    title: project.title,
+    date: project.date,
+    section: "ai",
+    kind: "project" as const,
+    excerpt: project.description,
+    tags: project.tags,
+  }));
+
+  return [...postEntries, ...projectEntries].sort((a, b) =>
+    a.date < b.date ? 1 : a.date > b.date ? -1 : 0,
   );
 }
 
-// Shrinks the scene on narrow viewports so the name fits; full size is kept
-// once the canvas is wide enough for the text (~720px at zoom 100).
-function ResponsiveScale({ children }: { children: React.ReactNode }) {
-  const { size } = useThree();
-  const scale = Math.min(1, size.width / 720);
-  return <group scale={scale}>{children}</group>;
-}
-
-function Scene() {
-  return (
-    <>
-      <Center rotation={[0, 1, 0]}>
-        <Text3D
-          curveSegments={32}
-          bevelEnabled
-          bevelSize={0.04}
-          bevelThickness={0.1}
-          height={0.5}
-          lineHeight={0.5}
-          letterSpacing={-0.06}
-          size={1.5}
-          font="/Inter_Bold.json">
-          {`Behrad\nKhodayar`}
-          <meshNormalMaterial />
-        </Text3D>
-      </Center>
-    </>
-  )
+export default function Home() {
+  return <PhosphorHome entries={buildFeed()} />;
 }

@@ -44,10 +44,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     ...sectionEntries("/ai", aiPosts),
-    // Projects carry no publish date, so their entries omit lastModified
-    // rather than report a value that changes on every build.
     ...projects.map((project) => ({
       url: `${SITE_URL}/ai/${project.slug}/`,
+      lastModified: new Date(project.date),
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),

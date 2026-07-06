@@ -9,6 +9,8 @@ export type { Post };
 export type Project = {
   slug: string;
   title: string;
+  /** ISO date (YYYY-MM-DD) — the date the project first shipped on the site. */
+  date: string;
   description: string;
   tags: string[];
 };
@@ -52,6 +54,7 @@ export const projects: Project[] = [
   {
     slug: "agentic-coding-stack-aio",
     title: "Agentic Coding Stack — All-in-One",
+    date: "2026-06-22",
     description:
       "An interactive ontology of the agentic coding stack: nine layers, the request lifecycle, cross-cutting concerns, and build-time provenance — explorable across four axes.",
     tags: ["Taxonomy", "Agents", "Interactive"],
