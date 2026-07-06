@@ -1,0 +1,70 @@
+import PostLayout from "../components/PostLayout";
+
+export const meta = {
+  title: "Introducing claude-code-py-ts-pg: a full-stack template w/ Claude built in",
+  date: "2026-07-06",
+  tags: ["Claude Code", "Template", "Full-Stack"],
+};
+
+export const metadata = {
+  title: meta.title,
+  description:
+    "Why & what of my new GitHub template (Python/FastAPI + TypeScript/React + Postgres) w/ a committed Claude Code harness: rules, skills, subagents & least-privilege permissions, treated as production infrastructure.",
+  alternates: {
+    canonical: "https://behrad.khodayar.me/ai/introducing-claude-code-py-ts-pg/",
+  },
+};
+
+export default function Layout({ children }) {
+  return (
+    <PostLayout meta={meta}>
+      {children}
+    </PostLayout>
+  );
+}
+
+*Source on [GitHub](https://github.com/behradkhodayar/claude-code-py-ts-pg). It's a template repo, so u can hit "Use this template" & go.*
+
+I've just published **claude-code-py-ts-pg**: a GitHub template for full-stack Python + TypeScript + PostgreSQL projects, w/ Claude Code wired in as a first-class team member (not an afterthought or config-heavy).
+
+### Why?
+
+Two frictions keep showing up, every single time I start a project:
+
+1. The first day goes to scaffolding the same stack over & over: FastAPI + SQLAlchemy + Alembic on one side, React + Vite + Vitest on the other, a Postgres container, a Makefile, CI... Boring, solved & still time-consuming.
+2. The AI harness config (rules, skills, permissions) lives in everyone's personal setup & never makes it into version control. So every teammate (& every fresh clone) re-teaches the agent the same conventions from scratch.
+
+My take: **the AI harness is production infrastructure**. It belongs in the repo, committed & shared, same as ur CI config. (Remember the amplifier? AI accelerates whatever environment u hand it, so ship the environment w/ the code.)
+
+### What?
+
+| Component     | Technologies                                              |
+| ------------- | --------------------------------------------------------- |
+| Backend API   | Python 3.14 · FastAPI · SQLAlchemy 2.0 · Alembic · `uv`   |
+| Frontend      | TypeScript · React 19 · Vite · Vitest                     |
+| Database      | PostgreSQL 17 (local Docker)                              |
+| Orchestration | Docker + Docker Compose                                   |
+| AI harness    | `.claude/`: rules, skills, subagents, scoped permissions |
+
+The `.claude/` directory is the actual point of the repo:
+
+- **`CLAUDE.md`**: the project brief every session loads.
+- **`.claude/rules/`**: path-scoped conventions; Python rules load only when backend files enter context, TS rules for the frontend.
+- **`.claude/skills/`**: repeatable workflows: `/db-migrate`, `/db-reset`, `/new-migration`.
+- **`.claude/agents/`**: a read-only code-reviewer subagent.
+- **`.claude/settings.json`**: least-privilege permissions + format-on-write hooks.
+
+### How?
+
+```bash
+cp .env.example .env
+make up      # API on :8000, web on :5173, Postgres on :5432
+```
+
+Everything routes through the Makefile (`make test`, `make lint`, `make fmt`, `make db-reset`) so humans & agents share a single entry point (& a single set of commands to allowlist).
+
+To start ur own project: use the template on GitHub, rename `ccaidtemplate` to ur project id, rewrite `CLAUDE.md` w/ ur own context, & drop the sample `items` resource once u've got real features in.
+
+### Wdyt?
+
+Go grab it, it's MIT licensed. If ur team commits its harness to the repo too (or refuses to, on principle), I'd love to hear why. Issues & PRs welcome.
