@@ -27,8 +27,315 @@ body {
   height: 100%;
 }
 
-#scene-container{
-      height:100vh;
+/* ---------------------------------------------------------------------------
+   Homepage: phosphor CRT terminal.
+   The homepage commits to green-on-black in both color schemes — a CRT is
+   dark even in daylight. body:has() rewires the shared theme vars so the
+   fixed nav inherits the look with no JS and no flash.
+--------------------------------------------------------------------------- */
+body:has([data-phosphor-home]) {
+  --background: #050806;
+  --foreground: #cdeed3;
+  color-scheme: dark;
+}
+
+[data-phosphor-home] {
+  /* P1-phosphor palette */
+  --phos: #41ff78; /* lit phosphor: prompt, name, hovered titles */
+  --phos-dim: #2aa14f; /* resting phosphor: dates, labels, markers */
+  --phos-trace: rgba(65, 255, 120, 0.16); /* borders */
+  --phos-glow: rgba(65, 255, 120, 0.35); /* text/box glow */
+  font-family: var(--font-geist-mono), monospace;
+}
+
+/* Faint scanlines + edge vignette over the whole viewport (below the nav). */
+[data-phosphor-home]::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 100% at 50% 0%, transparent 55%, rgba(0, 0, 0, 0.3)),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 2px,
+      rgba(3, 8, 5, 0.18) 2px,
+      rgba(3, 8, 5, 0.18) 3px
+    );
+}
+
+[data-phosphor-home] ::selection {
+  background: var(--phos);
+  color: #04120a;
+}
+
+/* --- header ---------------------------------------------------------- */
+.phos-prompt {
+  font-size: 13px;
+  color: var(--phos-dim);
+}
+.phos-user {
+  color: var(--phos);
+}
+.phos-cursor {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.05em;
+  margin-bottom: -0.15em;
+  background: var(--phos);
+  box-shadow: 0 0 8px var(--phos-glow);
+  animation: phos-blink 1.1s steps(1) infinite;
+}
+@keyframes phos-blink {
+  50% {
+    opacity: 0;
+  }
+}
+.phos-name {
+  margin-top: 1.4rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--phos);
+  text-shadow: 0 0 18px var(--phos-glow);
+}
+.phos-bio {
+  margin-top: 0.35rem;
+  max-width: 60ch;
+  font-size: 13.5px;
+  line-height: 1.6;
+  opacity: 0.72;
+}
+.phos-total {
+  margin-bottom: 0.25rem;
+  font-size: 12px;
+  color: var(--phos-dim);
+}
+
+/* --- year markers ----------------------------------------------------- */
+.phos-year {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.7rem 0 0.5rem;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  color: var(--phos-dim);
+}
+.phos-year::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(to right, var(--phos-trace), transparent);
+}
+
+/* --- rows -------------------------------------------------------------
+   Resting rows are bare terminal lines; the "box" only materializes on
+   hover/focus: border + glow fade in, the row lifts and tilts toward the
+   cursor, and the excerpt unfolds. Transitions are asymmetric — fast
+   ignite in (the :hover rule), slow phosphor decay out (the base rule). */
+.phos-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+}
+.phos-row {
+  --rx: 0deg;
+  --ry: 0deg;
+  --mx: 50%;
+  --my: 50%;
+}
+.phos-card {
+  position: relative;
+  display: block;
+  margin: 0 -0.85rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  transform: perspective(750px) rotateX(var(--rx)) rotateY(var(--ry))
+    translateZ(0);
+  transition:
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.7s ease,
+    background-color 0.7s ease,
+    box-shadow 0.7s ease;
+}
+.phos-row:hover .phos-card,
+.phos-row:focus-within .phos-card {
+  border-color: var(--phos-trace);
+  background-color: rgba(65, 255, 120, 0.045);
+  box-shadow:
+    0 0 24px rgba(65, 255, 120, 0.12),
+    0 16px 40px rgba(0, 0, 0, 0.5);
+  transform: perspective(750px) rotateX(var(--rx)) rotateY(var(--ry))
+    translateZ(16px);
+  transition-duration: 0.16s;
+}
+.phos-card:focus-visible {
+  outline: 2px solid var(--phos);
+  outline-offset: 2px;
+}
+/* Specular glare tracking the pointer. */
+.phos-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    240px circle at var(--mx) var(--my),
+    rgba(140, 255, 180, 0.1),
+    transparent 65%
+  );
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.phos-row:hover .phos-card::after {
+  opacity: 1;
+  transition-duration: 0.16s;
+}
+
+.phos-line {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+@media (min-width: 640px) {
+  .phos-line {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 1rem;
+  }
+  .phos-section {
+    min-width: 12ch;
+  }
+}
+.phos-meta {
+  display: inline-flex;
+  gap: 1ch;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--phos-dim);
+}
+.phos-title {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.5;
+  transition: color 0.7s ease, text-shadow 0.7s ease;
+}
+.phos-row:hover .phos-title,
+.phos-row:focus-within .phos-title {
+  color: var(--phos);
+  text-shadow: 0 0 12px var(--phos-glow);
+  transition-duration: 0.16s;
+}
+
+/* --- hover expansion (grid-rows 0fr -> 1fr animates height) ------------ */
+.phos-more {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.phos-more-inner {
+  display: block;
+  overflow: hidden;
+  min-height: 0;
+  opacity: 0;
+  transition: opacity 0.55s ease;
+}
+.phos-row:hover .phos-more,
+.phos-row:focus-within .phos-more {
+  grid-template-rows: 1fr;
+  transition-duration: 0.28s;
+}
+.phos-row:hover .phos-more-inner,
+.phos-row:focus-within .phos-more-inner {
+  opacity: 1;
+  transition: opacity 0.25s ease 0.06s;
+}
+.phos-excerpt {
+  display: block;
+  padding-top: 0.55rem;
+  font-size: 13px;
+  line-height: 1.6;
+  opacity: 0.78;
+}
+.phos-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.6rem 0 0.15rem;
+}
+.phos-tag {
+  border: 1px solid var(--phos-trace);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 11px;
+  color: var(--phos-dim);
+}
+
+/* --- load cascade: rows ignite bright, then decay to rest -------------- */
+@keyframes phos-ignite {
+  0% {
+    opacity: 0;
+    transform: translateY(7px);
+    filter: brightness(2.1) saturate(1.5);
+  }
+  35% {
+    opacity: 1;
+    filter: brightness(1.9) saturate(1.4);
+    text-shadow: 0 0 14px var(--phos-glow);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    text-shadow: none;
+  }
+}
+.phos-ignite {
+  animation: phos-ignite 0.9s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 45ms + 80ms);
+}
+
+/* --- no hover (touch): excerpts stay open, boxes stay traced ----------- */
+@media (hover: none) {
+  .phos-card {
+    border-color: var(--phos-trace);
+  }
+  .phos-more {
+    grid-template-rows: 1fr;
+  }
+  .phos-more-inner {
+    opacity: 1;
+  }
+}
+
+/* --- reduced motion: no cascade, no blink, no tilt, instant expand ----- */
+@media (prefers-reduced-motion: reduce) {
+  .phos-ignite {
+    animation: none;
+  }
+  .phos-cursor {
+    animation: none;
+  }
+  .phos-card,
+  .phos-card::after,
+  .phos-title,
+  .phos-more,
+  .phos-more-inner {
+    transition: none;
+  }
+  .phos-row:hover .phos-card,
+  .phos-row:focus-within .phos-card {
+    transform: none;
+  }
 }
 
 /* rehype-pretty-code: let the shiki theme own code-block colors inside prose */
