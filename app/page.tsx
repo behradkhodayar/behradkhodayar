@@ -1,4 +1,3 @@
-import type { Viewport } from "next";
 import { type FeedEntry } from "./lib/content";
 import { posts as aiPosts, projects } from "./ai/content";
 import { posts as blockchainPosts } from "./blockchain/content";
@@ -42,12 +41,6 @@ function buildFeed(): FeedEntry[] {
     a.date < b.date ? 1 : a.date > b.date ? -1 : 0,
   );
 }
-
-// The homepage is a phosphor CRT in both color schemes, so its browser
-// chrome color is fixed dark regardless of the layout's scheme-aware pair.
-export const viewport: Viewport = {
-  themeColor: "#050806",
-};
 
 export default function Home() {
   return <PhosphorHome entries={buildFeed()} />;

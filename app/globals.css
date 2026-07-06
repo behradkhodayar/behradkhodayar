@@ -2,8 +2,15 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* P1-phosphor CRT palette — the whole site is green-on-black in both
+     color schemes; a CRT is dark even in daylight. */
+  --background: #050806;
+  --foreground: #cdeed3;
+  --phos: #41ff78; /* lit phosphor: links, accents, hovered titles */
+  --phos-dim: #2aa14f; /* resting phosphor: dates, labels, markers */
+  --phos-trace: rgba(65, 255, 120, 0.16); /* borders */
+  --phos-glow: rgba(65, 255, 120, 0.35); /* text/box glow */
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -13,13 +20,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
@@ -27,29 +27,8 @@ body {
   height: 100%;
 }
 
-/* ---------------------------------------------------------------------------
-   Homepage: phosphor CRT terminal.
-   The homepage commits to green-on-black in both color schemes — a CRT is
-   dark even in daylight. body:has() rewires the shared theme vars so the
-   fixed nav inherits the look with no JS and no flash.
---------------------------------------------------------------------------- */
-body:has([data-phosphor-home]) {
-  --background: #050806;
-  --foreground: #cdeed3;
-  color-scheme: dark;
-}
-
-[data-phosphor-home] {
-  /* P1-phosphor palette */
-  --phos: #41ff78; /* lit phosphor: prompt, name, hovered titles */
-  --phos-dim: #2aa14f; /* resting phosphor: dates, labels, markers */
-  --phos-trace: rgba(65, 255, 120, 0.16); /* borders */
-  --phos-glow: rgba(65, 255, 120, 0.35); /* text/box glow */
-  font-family: var(--font-geist-mono), monospace;
-}
-
 /* Faint scanlines + edge vignette over the whole viewport (below the nav). */
-[data-phosphor-home]::before {
+body::before {
   content: "";
   position: fixed;
   inset: 0;
@@ -66,9 +45,37 @@ body:has([data-phosphor-home]) {
     );
 }
 
-[data-phosphor-home] ::selection {
+::selection {
   background: var(--phos);
   color: #04120a;
+}
+
+/* Phosphor-tint the article typography (@tailwindcss/typography). The
+   `prose-invert` vars are overridden so posts read green-white, not gray. */
+.prose {
+  --tw-prose-invert-body: #c4e5cb;
+  --tw-prose-invert-headings: #e2fbe7;
+  --tw-prose-invert-lead: #b9dcc1;
+  --tw-prose-invert-links: var(--phos);
+  --tw-prose-invert-bold: #e2fbe7;
+  --tw-prose-invert-counters: var(--phos-dim);
+  --tw-prose-invert-bullets: var(--phos-dim);
+  --tw-prose-invert-hr: rgba(65, 255, 120, 0.2);
+  --tw-prose-invert-quotes: #b9dcc1;
+  --tw-prose-invert-quote-borders: rgba(65, 255, 120, 0.3);
+  --tw-prose-invert-captions: #8fb597;
+  --tw-prose-invert-code: #d7f7dd;
+  --tw-prose-invert-th-borders: rgba(65, 255, 120, 0.25);
+  --tw-prose-invert-td-borders: rgba(65, 255, 120, 0.15);
+}
+
+/* ---------------------------------------------------------------------------
+   Homepage: phosphor CRT terminal. The palette is global (see :root); the
+   animated behavior below — ignite cascade, 3D hover expansion, blinking
+   cursor — stays homepage-only.
+--------------------------------------------------------------------------- */
+[data-phosphor-home] {
+  font-family: var(--font-geist-mono), monospace;
 }
 
 /* --- header ---------------------------------------------------------- */

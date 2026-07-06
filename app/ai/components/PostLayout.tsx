@@ -56,7 +56,8 @@ export default function PostLayout({
         </div>
       </header>
 
-      <article className="prose prose-neutral max-w-none dark:prose-invert prose-headings:scroll-mt-24 prose-pre:p-0 prose-pre:bg-transparent">
+      {/* prose-invert unconditionally: the site theme is dark in both schemes */}
+      <article className="prose prose-neutral prose-invert max-w-none prose-headings:scroll-mt-24 prose-pre:p-0 prose-pre:bg-transparent">
         {children}
       </article>
     </main>
