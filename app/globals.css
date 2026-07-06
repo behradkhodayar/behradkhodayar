@@ -287,6 +287,51 @@ body::before {
   color: var(--phos-dim);
 }
 
+.phos-feed {
+  /* keeps the feed top clear of the fixed nav when a page flip scrolls up */
+  scroll-margin-top: 6rem;
+}
+
+/* --- pager: 5 entries per screen, styled like a `less` prompt ---------- */
+.phos-pager {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2.2rem;
+  font-size: 13px;
+  color: var(--phos-dim);
+}
+.phos-pager-btn {
+  font: inherit;
+  color: var(--phos-dim);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 0.2rem 0.6rem;
+  cursor: pointer;
+  transition:
+    color 0.16s ease,
+    border-color 0.16s ease,
+    text-shadow 0.16s ease;
+}
+.phos-pager-btn:hover:not(:disabled) {
+  color: var(--phos);
+  border-color: var(--phos-trace);
+  text-shadow: 0 0 10px var(--phos-glow);
+}
+.phos-pager-btn:focus-visible {
+  outline: 2px solid var(--phos);
+  outline-offset: 2px;
+}
+.phos-pager-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.phos-pager-status {
+  letter-spacing: 0.08em;
+}
+
 /* --- load cascade: rows ignite bright, then decay to rest -------------- */
 @keyframes phos-ignite {
   0% {
