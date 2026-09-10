@@ -6,11 +6,55 @@ import type { FeedEntry } from "../lib/content";
 
 const PAGE_SIZE = 5;
 
+function PhosCard({
+  entry,
+  featured = false,
+}: {
+  entry: FeedEntry;
+  featured?: boolean;
+}) {
+  return (
+    <Link href={entry.href} className="phos-card">
+      <span className="phos-line">
+        <span className="phos-meta">
+          <span className="phos-mode" aria-hidden="true">
+            {featured ? "*rw-" : entry.kind === "project" ? "drwx" : "-rw-"}
+          </span>
+          <time dateTime={entry.date} className="phos-date">
+            {entry.date}
+          </time>
+          <span className="phos-section">
+            {featured ? "[now]" : `[${entry.section}]`}
+          </span>
+          {featured && <span className="sr-only">featured</span>}
+          {entry.kind === "project" && (
+            <span className="sr-only">interactive project</span>
+          )}
+        </span>
+        <span className="phos-title">{entry.title}</span>
+      </span>
+      <span className="phos-more">
+        <span className="phos-more-inner">
+          <span className="phos-excerpt">{entry.excerpt}</span>
+          <span className="phos-tags">
+            {entry.tags.map((tag) => (
+              <span key={tag} className="phos-tag">
+                {tag}
+              </span>
+            ))}
+          </span>
+        </span>
+      </span>
+    </Link>
+  );
+}
+
 // The homepage terminal: one chronological feed of everything written and
 // built, rendered as an `ls -t` listing on a phosphor CRT. Rows ignite on
 // load and expand in 3D toward the cursor on hover; all the visual work
 // lives in globals.css under [data-phosphor-home].
 export default function PhosphorHome({ entries }: { entries: FeedEntry[] }) {
+  const rootRef = useRef<HTMLElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(0);
   const pageCount = Math.ceil(entries.length / PAGE_SIZE);
@@ -34,7 +78,7 @@ export default function PhosphorHome({ entries }: { entries: FeedEntry[] }) {
   // Cursor-tracked tilt + glare: pointermove over a row updates its CSS vars,
   // rAF-throttled and transform-only, so nothing here triggers layout.
   useEffect(() => {
-    const root = listRef.current;
+    const root = rootRef.current;
     if (!root) return;
     if (!window.matchMedia("(hover: hover)").matches) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -82,6 +126,7 @@ export default function PhosphorHome({ entries }: { entries: FeedEntry[] }) {
     };
   }, []);
 
+  const featured = entries.find((entry) => entry.featured);
   const pageEntries = entries.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
   const groups: { year: string; entries: FeedEntry[] }[] = [];
   for (const entry of pageEntries) {
@@ -91,13 +136,14 @@ export default function PhosphorHome({ entries }: { entries: FeedEntry[] }) {
     else groups.push({ year, entries: [entry] });
   }
 
-  // Sequential ignite order: header, then `total`, then each year marker and
-  // row in document order. Drives the staggered load cascade.
+  // Sequential ignite order: header, then `now.txt`, then `total`, then each
+  // year marker and row in document order. Drives the staggered load cascade.
   let ignite = 0;
   const igniteStyle = () => ({ "--i": ignite++ }) as React.CSSProperties;
 
   return (
     <main
+      ref={rootRef}
       data-phosphor-home
       className="mx-auto max-w-3xl px-5 pb-24 pt-24 md:pt-28"
     >
@@ -112,6 +158,23 @@ export default function PhosphorHome({ entries }: { entries: FeedEntry[] }) {
           AI to do it for me.
         </p>
       </header>
+
+      {featured && (
+        <section
+          className="phos-now phos-ignite"
+          style={igniteStyle()}
+          aria-label="Now"
+        >
+          <p className="phos-prompt" aria-hidden="true">
+            <span className="phos-user">behrad@khodayar</span>:~ $ cat now.txt
+          </p>
+          <ol className="phos-list">
+            <li data-row className="phos-row phos-now-row">
+              <PhosCard entry={featured} featured />
+            </li>
+          </ol>
+        </section>
+      )}
 
       <p className="phos-total phos-ignite" style={igniteStyle()} aria-hidden="true">
         total {entries.length}
@@ -132,35 +195,7 @@ export default function PhosphorHome({ entries }: { entries: FeedEntry[] }) {
                   className="phos-row phos-ignite"
                   style={igniteStyle()}
                 >
-                  <Link href={entry.href} className="phos-card">
-                    <span className="phos-line">
-                      <span className="phos-meta">
-                        <span className="phos-mode" aria-hidden="true">
-                          {entry.kind === "project" ? "drwx" : "-rw-"}
-                        </span>
-                        <time dateTime={entry.date} className="phos-date">
-                          {entry.date}
-                        </time>
-                        <span className="phos-section">[{entry.section}]</span>
-                        {entry.kind === "project" && (
-                          <span className="sr-only">interactive project</span>
-                        )}
-                      </span>
-                      <span className="phos-title">{entry.title}</span>
-                    </span>
-                    <span className="phos-more">
-                      <span className="phos-more-inner">
-                        <span className="phos-excerpt">{entry.excerpt}</span>
-                        <span className="phos-tags">
-                          {entry.tags.map((tag) => (
-                            <span key={tag} className="phos-tag">
-                              {tag}
-                            </span>
-                          ))}
-                        </span>
-                      </span>
-                    </span>
-                  </Link>
+                  <PhosCard entry={entry} />
                 </li>
               ))}
             </ol>

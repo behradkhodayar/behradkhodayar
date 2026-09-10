@@ -120,6 +120,37 @@ body::before {
   color: var(--phos-dim);
 }
 
+/* --- now.txt: a persistently lit row above the listing ----------------
+   The chronological feed stays dormant until hover. This one is already
+   "open" — excerpt unfolded, title ignited — so a new piece can't hide
+   behind pagination or the rest-state listing. */
+.phos-now {
+  margin: 0 0 1.8rem;
+}
+.phos-now .phos-prompt {
+  margin-bottom: 0.45rem;
+}
+.phos-now-row .phos-card {
+  border-color: var(--phos-trace);
+  background-color: rgba(65, 255, 120, 0.045);
+  box-shadow:
+    0 0 24px rgba(65, 255, 120, 0.12),
+    0 12px 32px rgba(0, 0, 0, 0.4);
+}
+.phos-now-row .phos-title {
+  color: var(--phos);
+  text-shadow: 0 0 12px var(--phos-glow);
+}
+.phos-now-row .phos-more {
+  grid-template-rows: 1fr;
+}
+.phos-now-row .phos-more-inner {
+  opacity: 1;
+}
+.phos-now-row .phos-mode {
+  color: var(--phos);
+}
+
 /* --- year markers ----------------------------------------------------- */
 .phos-year {
   display: flex;

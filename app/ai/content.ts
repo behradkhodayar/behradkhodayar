@@ -17,6 +17,15 @@ export type Project = {
 
 export const posts: Post[] = [
   {
+    slug: "introducing-repodify",
+    title: "Introducing Repodify: turn a stretch of a podcast into one tailored digest",
+    date: "2026-09-08",
+    excerpt:
+      "Search a show, pick a stretch of episodes & it writes u one shorter, tailored digest — on ur GPU, or w/ ur own keys. Not a SaaS that keeps the audio.",
+    tags: ["Repodify", "Podcasts", "Local AI"],
+    featured: true,
+  },
+  {
     slug: "introducing-claude-code-py-ts-pg",
     title: "Introducing claude-code-py-ts-pg: a full-stack template w/ Claude built in",
     date: "2026-07-06",
