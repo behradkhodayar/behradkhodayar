@@ -1,9 +1,30 @@
+import type { Metadata } from "next";
 import { type FeedEntry } from "./lib/content";
 import { posts as aiPosts, projects } from "./ai/content";
 import { posts as blockchainPosts } from "./blockchain/content";
 import { posts as chessPosts } from "./chess/content";
 import { posts as devToolsPosts } from "./dev-tools/content";
 import PhosphorHome from "./components/PhosphorHome";
+import {
+  PERSON_DESCRIPTION,
+  PERSON_IMAGE,
+  PERSON_NAME,
+  SITE_URL,
+  personJsonLd,
+} from "./lib/site";
+
+export const metadata: Metadata = {
+  alternates: { canonical: `${SITE_URL}/` },
+  openGraph: {
+    type: "profile",
+    url: `${SITE_URL}/`,
+    firstName: "Behrad",
+    lastName: "Khodayar",
+    title: `${PERSON_NAME} — Software Engineer`,
+    description: PERSON_DESCRIPTION,
+    images: [{ url: PERSON_IMAGE, alt: `Photo of ${PERSON_NAME}` }],
+  },
+};
 
 // The homepage feed: every post and project across sections, newest first.
 // Sections keep their own listings; this page is the merged chronology.
@@ -44,5 +65,13 @@ function buildFeed(): FeedEntry[] {
 }
 
 export default function Home() {
-  return <PhosphorHome entries={buildFeed()} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+      />
+      <PhosphorHome entries={buildFeed()} />
+    </>
+  );
 }

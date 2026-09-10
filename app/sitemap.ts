@@ -4,10 +4,9 @@ import { posts as blockchainPosts } from "./blockchain/content";
 import { posts as chessPosts } from "./chess/content";
 import { posts as devToolsPosts } from "./dev-tools/content";
 import type { Post } from "./lib/content";
+import { SITE_URL } from "./lib/site";
 
 export const dynamic = "force-static";
-
-const SITE_URL = "https://behrad.khodayar.me";
 
 /** Publish date of the newest post — the last time the listing actually changed. */
 function newestDate(posts: Post[]): Date {
@@ -38,7 +37,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     {
-      url: SITE_URL,
+      url: `${SITE_URL}/`,
       lastModified: newestDate(sections.flat()),
       changeFrequency: "monthly",
       priority: 1,

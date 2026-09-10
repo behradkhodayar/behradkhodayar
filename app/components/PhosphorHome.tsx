@@ -1,10 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { FeedEntry } from "../lib/content";
-
-const PAGE_SIZE = 5;
 
 function PhosCard({
   entry,
@@ -55,25 +53,6 @@ function PhosCard({
 // lives in globals.css under [data-phosphor-home].
 export default function PhosphorHome({ entries }: { entries: FeedEntry[] }) {
   const rootRef = useRef<HTMLElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
-  const [page, setPage] = useState(0);
-  const pageCount = Math.ceil(entries.length / PAGE_SIZE);
-
-  // After a page flip, bring the feed top back on screen if it scrolled away.
-  const mounted = useRef(false);
-  useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true;
-      return;
-    }
-    const feed = listRef.current;
-    if (feed && feed.getBoundingClientRect().top < 0) {
-      const reduce = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-      feed.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" });
-    }
-  }, [page]);
 
   // Cursor-tracked tilt + glare: pointermove over a row updates its CSS vars,
   // rAF-throttled and transform-only, so nothing here triggers layout.
@@ -127,9 +106,8 @@ export default function PhosphorHome({ entries }: { entries: FeedEntry[] }) {
   }, []);
 
   const featured = entries.find((entry) => entry.featured);
-  const pageEntries = entries.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
   const groups: { year: string; entries: FeedEntry[] }[] = [];
-  for (const entry of pageEntries) {
+  for (const entry of entries) {
     const year = entry.date.slice(0, 4);
     const last = groups[groups.length - 1];
     if (last && last.year === year) last.entries.push(entry);
@@ -180,10 +158,9 @@ export default function PhosphorHome({ entries }: { entries: FeedEntry[] }) {
         total {entries.length}
       </p>
 
-      <div ref={listRef} className="phos-feed">
-        {/* keyed by page too, so flipping remounts rows and replays the ignite cascade */}
+      <div className="phos-feed">
         {groups.map((group) => (
-          <section key={`${group.year}-p${page}`} aria-label={group.year}>
+          <section key={group.year} aria-label={group.year}>
             <h2 className="phos-year phos-ignite" style={igniteStyle()}>
               {group.year}
             </h2>
@@ -203,29 +180,6 @@ export default function PhosphorHome({ entries }: { entries: FeedEntry[] }) {
         ))}
       </div>
 
-      {pageCount > 1 && (
-        <nav className="phos-pager" aria-label="Feed pages">
-          <button
-            type="button"
-            className="phos-pager-btn"
-            disabled={page === 0}
-            onClick={() => setPage(page - 1)}
-          >
-            ← newer
-          </button>
-          <span className="phos-pager-status" aria-live="polite">
-            -- page {page + 1}/{pageCount} --
-          </span>
-          <button
-            type="button"
-            className="phos-pager-btn"
-            disabled={page === pageCount - 1}
-            onClick={() => setPage(page + 1)}
-          >
-            older →
-          </button>
-        </nav>
-      )}
     </main>
   );
 }

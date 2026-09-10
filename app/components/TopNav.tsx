@@ -147,11 +147,11 @@ export default function TopNav() {
         </button>
       </div>
 
-      {open && (
-        <div
-          id="mobile-menu"
-          className="md:hidden px-4 pb-4 pt-1 border-t border-[var(--foreground)]/10"
-        >
+      <div
+        id="mobile-menu"
+        hidden={!open}
+        className="md:hidden px-4 pb-4 pt-1 border-t border-[var(--foreground)]/10"
+      >
           <ul className="flex flex-col">
             {SECTIONS.map((section) => (
               <li key={section.href}>
@@ -182,8 +182,7 @@ export default function TopNav() {
               </li>
             ))}
           </ul>
-        </div>
-      )}
+      </div>
     </nav>
   );
 }
