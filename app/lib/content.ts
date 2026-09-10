@@ -9,6 +9,8 @@ export type Post = {
   date: string;
   excerpt: string;
   tags: string[];
+  /** When true, the homepage pins this entry above the chronological feed. */
+  featured?: boolean;
 };
 
 /** Newest-first copy of `posts` for listing. */
@@ -29,4 +31,6 @@ export type FeedEntry = {
   kind: "post" | "project";
   excerpt: string;
   tags: string[];
+  /** Pinned above the chronological listing on the homepage. */
+  featured?: boolean;
 };

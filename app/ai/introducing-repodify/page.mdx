@@ -1,0 +1,188 @@
+import PostLayout from "../components/PostLayout";
+import Video from "../components/Video";
+
+export const meta = {
+  title: "Introducing Repodify: turn a stretch of a podcast into one tailored digest",
+  date: "2026-09-08",
+  tags: ["Repodify", "Podcasts", "Local AI"],
+};
+
+export const metadata = {
+  title: meta.title,
+  description:
+    "Search a show, pick a stretch of episodes & it writes u one shorter, tailored digest — on ur GPU, or w/ ur own keys. Not a SaaS that keeps the audio.",
+  alternates: {
+    canonical: "https://behrad.khodayar.me/ai/introducing-repodify/",
+  },
+  openGraph: {
+    title: meta.title,
+    description:
+      "Search a show, pick a stretch of episodes & it writes u one shorter, tailored digest — on ur GPU, or w/ ur own keys.",
+    images: [{ url: "/repodify/brand-banner.png", alt: "Repodify" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: meta.title,
+    description:
+      "Search a show, pick a stretch of episodes & it writes u one shorter, tailored digest — on ur GPU, or w/ ur own keys.",
+    images: ["/repodify/brand-banner.png"],
+  },
+};
+
+export default function Layout({ children }) {
+  return <PostLayout meta={meta}>{children}</PostLayout>;
+}
+
+*Originally published as an [X article](https://x.com/behradkhodayar/status/2097335489904644194) (September 8, 2026). Source on [GitHub](https://github.com/behradkhodayar/repodify).*
+
+![Repodify — podcasts retold, ur way, on ur local machine](/repodify/brand-banner.png)
+
+Suppose it's 2026 & u're new to ML.
+
+U don't want another "attention is all you need" explainer. U want the *history* (how the field actually talked about itself while it was happening). The podcasts are there. They're also 300 episodes long.
+
+So I built **Repodify**.
+
+Search a show, pick a stretch of episodes & it writes u one shorter, tailored digest. It runs on ur GPU, or w/ ur own keys (BYOK). Not mine. Not a SaaS that keeps the audio.
+
+Today I pointed it at the show that basically *is* that history.
+
+### Why?
+
+I didn't start this to ship another wrapper around Whisper.
+
+I started it b/c I wanted to *listen through* a field. [Linear Digressions](https://lineardigressions.com/) is the perfect specimen (or TWIML, etc): a decade of ML explained while the papers were still warm. U cannot do that by "saving 12 episodes to a playlist." U need a through-line.
+
+Repodify is that through-line, generated on hardware u control, steered by a prompt u wrote.
+
+Translate it. Augment it. Cut it to 12 minutes. Keep the original cast on ur laptop for a class. That's the product.
+
+Most "AI podcast" tools are a cloud tab that keeps ur audio & bills u per min. Repodify is the opposite on purpose.
+
+### What?
+
+Search for ur desired podcast name (or paste its link), pick the episodes u want, & Repodify creates a single chronological episode u can stream or download.
+
+Under the hood it's a linear pipeline. U pick a stretch of a show; it does the rest:
+
+| Stage | What it does |
+| --- | --- |
+| Resolve | Search / paste → live RSS → episodes, oldest first |
+| Download | Pull the selected audio onto ur machine |
+| Transcribe | Speech-to-text (local Whisper, or BYOK) |
+| Diarize | Who spoke when, clustered across episodes (optional) |
+| Summarize | LLM map: one summary per episode |
+| Arc | LLM reduce: one chronological through-line |
+| Script | A spoken script sized to a target duration |
+| Synth | TTS (stock voice, or cloned — see the guardrails) |
+| Assemble | `digest.mp3` + chapters + show notes |
+
+Every ML stage asks u: **local GPU, or BYOK?** U can mix them. Whisper on the box, LLM through ur OpenRouter key, TTS through Kokoro, whatever u've actually got.
+
+It's MIT. It's a PWA. `./launch` is the whole stack.
+
+![Repodify overview — new digest, history, settings](/repodify/01-overview.png)
+
+### The experiment
+
+Linear Digressions (Katie Malone &, in the early years, Ben / Phoebe) started in November 2014. I took the **first five episodes**, oldest first:
+
+1. **Hunting for the Higgs** — Nov 16, 2014 · 10 min
+2. **How Outliers Helped Defeat Cholera** — Nov 22, 2014 · 11 min
+3. **Computers Try to Tell Jokes** — Nov 26, 2014 · 9 min
+4. **Stats of World Series Streaks** — Dec 17, 2014 · 13 min
+5. **Facial Recognition with Eigenfaces** — Jan 7, 2015 · 10 min
+
+That's **~53 minutes** of 2014 data science: the LHC, John Snow's pump, a joke-writing model, baseball as a binomial, PCA on faces.
+
+![Search results for Linear Digressions](/repodify/03-search-results.png)
+
+I did **not** clone their voices. Cloning in Repodify is labeled, disclaimed, watermarked & meant for local/educational use, but possible; & using someone's voice in public is a legal line I won't cross. This run is a single stock narrator.
+
+The digest that came out is **7 mins 40 secs**. Wall clock, start to finish: **6:42**.
+
+![The first five Linear Digressions episodes, oldest first, checked](/repodify/05b-first5-top.png)
+
+### What the pipeline actually did
+
+Search "Linear Digressions" → 323 episodes load from the live RSS → sort oldest → check five boxes → one custom instruction:
+
+> Write a chronological time capsule of how data science was taught in late 2014.
+
+Then the gates. Every ML stage asks u: local GPU or BYOK?
+
+![Transcribe gate: local faster-whisper vs BYOK OpenRouter](/repodify/08-gate-transcribe.png)
+
+![Summarize gate: pick the LLM backend & continue](/repodify/10-gate-summarize.png)
+
+| Stage | What happened |
+| --- | --- |
+| Resolve | 5 episodes selected |
+| Download | 5/5 · 66.9 MB · 29s |
+| Transcribe | faster-whisper `small`, local · 1m 26s |
+| Diarize | skipped (no per-speaker voices) |
+| Summarize + arc + script | OpenRouter `gpt-4o-mini`, my key · 1066 words |
+| TTS | `fish-audio/s2.1-pro`, stock voice "Heart" · 20 segments |
+| Assemble | `digest.mp3` + chapters + show notes |
+
+Whisper on an RTX 4060 Laptop (my personal machine) for this run. LLM & speech through my own OpenRouter key. Next job I can flip any stage to Ollama / Kokoro / F5 & leave the rest hosted.
+
+![Pipeline running after the TTS gate](/repodify/12-running-after-tts.png)
+
+Chapters it cut:
+
+- 0:00 Unveiling the Higgs with Machine Learning
+- 1:34 Outliers and the Birth of Epidemiology
+- 3:19 The Challenge of Computer Humor
+- 4:52 Statistical Unpredictability in Baseball Playoffs
+- 6:18 Decoding Facial Data with Eigenfaces
+
+That's the 2014 syllabus, in order, in one sitting.
+
+![Finished digest: 7:40, five chapters, 6m 42s wall clock](/repodify/16-result.png)
+
+The whole run, 4×:
+
+<Video src="/repodify/process.mp4" caption="Search → first five Linear Digressions → transcribe on-box → my OpenRouter key for the script → stock narrator. 4×." />
+
+### How?
+
+Two processes, ur machine: **FastAPI + an arq worker**. They never call each other. They share Redis, SQLite/Postgres & a folder of files. The API stays a thin HTTP layer; the long GPU-bound pipeline runs on the worker, paused at each gate so u can pick local vs BYOK without losing the job if u close the tab.
+
+**Ports, not a pile of SDKs.** STT, LLM, TTS, diarizer, cloner, watermarker — each is a Protocol w/ a Fake. Tests never touch a GPU or the network. `./launch --fake` walks the whole flow on CPU w/ no keys.
+
+**U pick the backend at the gate.** That's the whole point of the UX. The pipeline is `resolve → download → transcribe → diarize → voices → summarize → arc → script → synth`. Nodes marked as gates call LangGraph `interrupt()`, persist a SQLite checkpoint, & wait. U can shut the app down mid-job & pick it up later.
+
+**Cloning is not a silent default.** If u *do* clone, the show notes say `synthetic: true`, a spoken disclaimer is prepended in a non-cloned voice, & AudioSeal watermarks the file. There is no "looks original" path.
+
+![The result screen on a phone — it's a PWA](/repodify/m05-result.png)
+
+To try it:
+
+```bash
+git clone https://github.com/behradkhodayar/repodify
+cd repodify
+./launch
+```
+
+That's it. `./launch` syncs deps, starts Redis, & runs the API, the worker & the web app together.
+
+- **GPU on the box** → real local backends, no cloud required.
+- **No GPU** → a short BYOK wizard so u can plug in ur own keys.
+- **No GPU && no keys** → `./launch --fake` still walks the whole flow.
+
+When it's up:
+
+```
+  Built app     http://localhost:8000/app/
+```
+
+U need [uv](https://docs.astral.sh/uv/), Python 3.13, Node 20+, & Docker or Podman (for Redis). Real runs also need ffmpeg & a CUDA GPU. Press Ctrl-C to stop. `make stop` halts the containers.
+
+### Wdyt?
+
+Go grab it, it's MIT licensed. If this is useful, let me know what u like most about it. If u break it, open an issue. If u build the episode u wish existed, tell me. Finally, if u need a feature, plz lmk.
+
+Repo: [github.com/behradkhodayar/repodify](https://github.com/behradkhodayar/repodify)
+
+Linear Digressions is Katie Malone's show. This digest is a synthetic, educational remix, not the original, not affiliated, not a substitute for listening to them. If u haven't heard the real thing, start at [lineardigressions.com](https://lineardigressions.com/).

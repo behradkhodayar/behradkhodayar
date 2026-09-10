@@ -24,6 +24,7 @@ function buildFeed(): FeedEntry[] {
       kind: "post" as const,
       excerpt: post.excerpt,
       tags: post.tags,
+      featured: post.featured,
     })),
   );
 
